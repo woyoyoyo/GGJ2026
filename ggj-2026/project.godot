@@ -25,6 +25,10 @@ SaveManager="*res://autoload/save_manager.gd"
 InputRemapManager="*res://autoload/input_remap_manager.gd"
 LocalizationManager="*res://autoload/localization_manager.gd"
 
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
 [input]
 
 move_left={

@@ -14,6 +14,24 @@ func _ready() -> void:
 	add_child(sfx_player)
 	music_player.bus = "Music"
 	sfx_player.bus = "SFX"
+	
+	# Charger les volumes sauvegardés
+	load_audio_settings()
+
+
+func load_audio_settings() -> void:
+	var master_volume = SaveManager.get_setting("master_volume", 0.8)
+	var saved_music_volume = SaveManager.get_setting("music_volume", 0.8)
+	var saved_sfx_volume = SaveManager.get_setting("sfx_volume", 1.0)
+	
+	# Appliquer les volumes aux bus audio
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(master_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(saved_music_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(saved_sfx_volume))
+	
+	# Sauvegarder dans les variables
+	music_volume = saved_music_volume
+	sfx_volume = saved_sfx_volume
 
 
 func play_music(stream: AudioStream, fade_in: bool = true) -> void:
