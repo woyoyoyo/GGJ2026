@@ -109,11 +109,13 @@ ggj-2026/
 │   ├── sounds/      # Effets sonores
 │   ├── music/       # Musiques de fond
 │   └── fonts/       # Polices de caractères
-├── scenes/          # Scènes principales du jeu
-├── levels/          # Niveaux du jeu
-├── scripts/         # Scripts réutilisables (player, enemy, etc.)
-├── ui/              # Interfaces utilisateur (menus, HUD)
-├── autoload/        # Scripts singleton (GameManager, etc.)
+├── publish/         # Fichiers de publication
+├── src/             # Sources
+│   ├── scenes/      # Scènes principales du jeu
+│   ├── levels/      # Niveaux du jeu
+│   ├── scripts/     # Scripts réutilisables (player, enemy, etc.)
+│   ├── ui/          # Interfaces utilisateur (menus, HUD)
+│   ├── autoload/    # Scripts singleton (GameManager, etc.)
 └── project.godot    # Configuration du projet
 ```
 

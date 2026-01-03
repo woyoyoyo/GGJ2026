@@ -104,4 +104,4 @@ func _on_reset_button_pressed() -> void:
 
 
 func _on_back_pressed() -> void:
-	SceneManager.change_scene("res://ui/settings_menu.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_SETTINGS_MENU)

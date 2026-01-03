@@ -4,7 +4,7 @@ class_name MainMenu
 
 
 func _ready() -> void:
-	AudioManager.play_music(preload("res://assets/music/BranquesInteractive.ogg"))
+	AudioManager.play_music(preload(GameConstants.MUSIC_LOGO))
 	_update_texts()
 	_initialize_signals()
 
@@ -30,15 +30,15 @@ func _on_language_changed(_locale: String) -> void:
 
 
 func _on_start_pressed() -> void:
-	SceneManager.change_scene("res://scenes/main.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_MAIN_GAME)
 
 
 func _on_settings_pressed() -> void:
-	SceneManager.change_scene("res://ui/settings_menu.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_SETTINGS_MENU)
 
 
 func _on_credits_pressed() -> void:
-	SceneManager.change_scene("res://ui/credits_menu.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_CREDITS_MENU)
 
 
 func _on_quit_pressed() -> void:

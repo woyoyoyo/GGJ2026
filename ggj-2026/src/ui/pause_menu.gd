@@ -28,4 +28,4 @@ func _on_restart_pressed() -> void:
 
 func _on_main_menu_pressed() -> void:
 	get_tree().paused = false
-	SceneManager.change_scene("res://src/ui/main_menu.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_MAIN_MENU)
