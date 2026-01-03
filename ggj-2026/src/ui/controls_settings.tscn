@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://controls_settings"]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://ui/controls_settings.gd" id="1"]
+[ext_resource type="Script" uid="uid://cvx48tkmdmu7j" path="res://src/ui/controls_settings.gd" id="1"]
 
 [node name="ControlsSettings" type="Control"]
 script = ExtResource("1")

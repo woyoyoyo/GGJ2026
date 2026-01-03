@@ -21,8 +21,8 @@ var _fade_tween: Tween = null
 func _ready() -> void:
 	add_child(music_player)
 	add_child(sfx_player)
-	music_player.bus = "Music"
-	sfx_player.bus = "SFX"
+	music_player.bus = GameConstants.AUDIO_BUS_MUSIC
+	sfx_player.bus = GameConstants.AUDIO_BUS_SFX
 	
 	# Charger les volumes sauvegardés
 	load_audio_settings()
@@ -34,9 +34,9 @@ func load_audio_settings() -> void:
 	var saved_sfx_volume = SaveManager.get_setting("sfx_volume", 1.0)
 	
 	# Appliquer les volumes aux bus audio
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(master_volume))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(saved_music_volume))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(saved_sfx_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MASTER), linear_to_db(master_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MUSIC), linear_to_db(saved_music_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_SFX), linear_to_db(saved_sfx_volume))
 	
 	# Sauvegarder dans les variables
 	_music_volume = saved_music_volume
@@ -73,7 +73,7 @@ func play_sfx(stream: AudioStream) -> void:
 	var player := AudioStreamPlayer.new()
 	player.stream = stream
 	player.volume_db = linear_to_db(_sfx_volume)
-	player.bus = "SFX"
+	player.bus = GameConstants.AUDIO_BUS_SFX
 	add_child(player)
 	player.play()
 	player.finished.connect(func(): player.queue_free())

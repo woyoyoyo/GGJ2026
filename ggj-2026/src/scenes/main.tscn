@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://i3rjhltnwrxw"]
+
+[ext_resource type="Script" uid="uid://ddftavpnj0tio" path="res://src/scenes/main.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://hud" path="res://src/ui/hud.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://src/ui/pause_menu.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://src/ui/game_over.tscn" id="4"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="HUD" parent="." instance=ExtResource("2")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("3")]
+
+[node name="GameOver" parent="." instance=ExtResource("4")]

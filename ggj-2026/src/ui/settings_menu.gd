@@ -69,25 +69,25 @@ func load_settings() -> void:
 func _on_master_slider_changed(value: float) -> void:
 	var volume = value / 100.0
 	SaveManager.save_setting("master_volume", volume)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MASTER), linear_to_db(volume))
 
 
 func _on_music_slider_changed(value: float) -> void:
 	var volume = value / 100.0
 	SaveManager.save_setting("music_volume", volume)
 	AudioManager.music_volume = volume
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MUSIC), linear_to_db(volume))
 
 
 func _on_sfx_slider_changed(value: float) -> void:
 	var volume = value / 100.0
 	SaveManager.save_setting("sfx_volume", volume)
 	AudioManager.sfx_volume = volume
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_SFX), linear_to_db(volume))
 
 
 func _on_controls_button_pressed() -> void:
-	SceneManager.change_scene("res://ui/controls_settings.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_SETTINGS_MENU)
 
 
 func _on_language_selected(index: int) -> void:
@@ -96,7 +96,7 @@ func _on_language_selected(index: int) -> void:
 
 
 func _on_language_changed(_locale: String) -> void:
-	_update_texts()  # Mettre à jour tous les textes quand la langue change
+	_update_texts() # Mettre à jour tous les textes quand la langue change
 
 
 func _on_fullscreen_toggled(toggled_on: bool) -> void:
@@ -114,9 +114,9 @@ func _apply_audio_settings() -> void:
 	var music_volume = SaveManager.get_setting("music_volume", 0.8)
 	var sfx_volume = SaveManager.get_setting("sfx_volume", 1.0)
 	
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), linear_to_db(master_volume))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), linear_to_db(music_volume))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(sfx_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MASTER), linear_to_db(master_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_MUSIC), linear_to_db(music_volume))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(GameConstants.AUDIO_BUS_SFX), linear_to_db(sfx_volume))
 	AudioManager.music_volume = music_volume
 	AudioManager.sfx_volume = sfx_volume
 
@@ -162,4 +162,4 @@ func _confirm_reset() -> void:
 
 
 func _on_back_pressed() -> void:
-	SceneManager.change_scene("res://ui/main_menu.tscn")
+	SceneManager.change_scene(GameConstants.SCENE_MAIN_MENU)
