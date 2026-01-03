@@ -18,6 +18,7 @@ func _ready() -> void:
 	GameManager.game_over.connect(_on_game_over)
 	LocalizationManager.language_changed.connect(_update_texts)
 	_update_texts()
+	_setup_focus()
 
 
 func _update_texts(_locale: String = "") -> void:
@@ -41,6 +42,7 @@ func _on_game_over() -> void:
 	best_score_label.text = tr("GAME_OVER_BEST_SCORE") % best_score
 	control.show()
 	get_tree().paused = true
+	restart_button.grab_focus()
 
 
 func _on_restart_pressed() -> void:
@@ -57,3 +59,15 @@ func _on_main_menu_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()
+
+
+func _setup_focus() -> void:
+	# Définir les voisins pour navigation verticale
+	restart_button.focus_neighbor_top = quit_button.get_path()
+	restart_button.focus_neighbor_bottom = main_menu_button.get_path()
+	
+	main_menu_button.focus_neighbor_top = restart_button.get_path()
+	main_menu_button.focus_neighbor_bottom = quit_button.get_path()
+	
+	quit_button.focus_neighbor_top = main_menu_button.get_path()
+	quit_button.focus_neighbor_bottom = restart_button.get_path()

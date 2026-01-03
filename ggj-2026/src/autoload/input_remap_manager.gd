@@ -14,7 +14,7 @@ func _ready() -> void:
 
 
 func save_default_inputs() -> void:
-	var actions = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "pause"]
+	var actions = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "defense", "validate", "cancel", "pause"]
 	for action_name in actions:
 		if InputMap.has_action(action_name):
 			default_inputs[action_name] = InputMap.action_get_events(action_name).duplicate()
@@ -29,6 +29,9 @@ func get_action_display_name(action: String) -> String:
 		"jump": "ACTION_JUMP",
 		"action": "ACTION_ACTION",
 		"attack": "ACTION_ATTACK",
+		"defense": "ACTION_DEFENSE",
+		"validate": "ACTION_VALIDATE",
+		"cancel": "ACTION_CANCEL",
 		"pause": "ACTION_PAUSE"
 	}
 	return tr(keys.get(action, action))
@@ -47,18 +50,39 @@ func get_first_key_for_action(action: String) -> String:
 				MOUSE_BUTTON_LEFT: return tr("KEY_LEFT_CLICK")
 				MOUSE_BUTTON_RIGHT: return tr("KEY_RIGHT_CLICK")
 				MOUSE_BUTTON_MIDDLE: return tr("KEY_MIDDLE_CLICK")
+		elif event is InputEventJoypadButton:
+			return _get_joypad_button_name(event.button_index)
 	
 	return tr("KEY_UNASSIGNED")
+
+
+func _get_joypad_button_name(button_index: int) -> String:
+	match button_index:
+		JOY_BUTTON_A: return "A"
+		JOY_BUTTON_B: return "B"
+		JOY_BUTTON_X: return "X"
+		JOY_BUTTON_Y: return "Y"
+		JOY_BUTTON_LEFT_SHOULDER: return "LB"
+		JOY_BUTTON_RIGHT_SHOULDER: return "RB"
+		JOY_BUTTON_LEFT_STICK: return "L3"
+		JOY_BUTTON_RIGHT_STICK: return "R3"
+		JOY_BUTTON_START: return "Start"
+		JOY_BUTTON_BACK: return "Select"
+		JOY_BUTTON_DPAD_UP: return "D-Pad Up"
+		JOY_BUTTON_DPAD_DOWN: return "D-Pad Down"
+		JOY_BUTTON_DPAD_LEFT: return "D-Pad Left"
+		JOY_BUTTON_DPAD_RIGHT: return "D-Pad Right"
+		_: return "Button " + str(button_index)
 
 
 func remap_action(action: String, new_event: InputEvent) -> void:
 	if not InputMap.has_action(action):
 		return
 	
-	# Supprimer les anciens événements clavier/souris
+	# Supprimer les anciens événements clavier/souris/manette
 	var events = InputMap.action_get_events(action)
 	for event in events:
-		if event is InputEventKey or event is InputEventMouseButton:
+		if event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton:
 			InputMap.action_erase_event(action, event)
 	
 	# Ajouter le nouveau

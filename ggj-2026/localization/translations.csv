@@ -28,6 +28,9 @@ ACTION_MOVE_DOWN,Déplacement Bas,Move Down
 ACTION_JUMP,Sauter,Jump
 ACTION_ACTION,Action/Interagir,Action/Interact
 ACTION_ATTACK,Attaquer,Attack
+ACTION_DEFENSE,Défendre/Bloquer,Defend/Block
+ACTION_VALIDATE,Valider,Validate
+ACTION_CANCEL,Annuler/Retour,Cancel/Back
 ACTION_PAUSE,Pause,Pause
 
 CREDITS_TITLE,CRÉDITS,CREDITS

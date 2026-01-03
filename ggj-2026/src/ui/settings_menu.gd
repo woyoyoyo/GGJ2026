@@ -14,6 +14,8 @@ func _ready() -> void:
 	setup_language_options()
 	load_settings()
 	_update_texts()
+	_setup_focus()
+	_setup_slider_navigation()
 	LocalizationManager.language_changed.connect(_on_language_changed)
 
 
@@ -87,7 +89,7 @@ func _on_sfx_slider_changed(value: float) -> void:
 
 
 func _on_controls_button_pressed() -> void:
-	SceneManager.change_scene(GameConstants.SCENE_SETTINGS_MENU)
+	SceneManager.change_scene(GameConstants.SCENE_CONTROLS_SETTINGS)
 
 
 func _on_language_selected(index: int) -> void:
@@ -163,3 +165,24 @@ func _confirm_reset() -> void:
 
 func _on_back_pressed() -> void:
 	SceneManager.change_scene(GameConstants.SCENE_MAIN_MENU)
+
+
+func _setup_focus() -> void:
+	# Donner le focus au bouton Contrôles (premier bouton)
+	$MarginContainer/VBoxContainer/ControlsButton.grab_focus()
+
+
+func _setup_slider_navigation() -> void:
+	# Permettre la navigation gauche/droite sur les sliders avec la manette
+	for slider in [master_slider, music_slider, sfx_slider]:
+		slider.focus_mode = Control.FOCUS_ALL
+
+
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	
+	# Gestion du retour avec la manette
+	if event.is_action_pressed("ui_cancel"):
+		_on_back_pressed()
+		accept_event()

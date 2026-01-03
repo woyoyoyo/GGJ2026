@@ -3,8 +3,9 @@ extends Control
 class_name ControlsSettings
 
 @onready var inputs_container: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/InputsContainer
+@onready var scroll_container: ScrollContainer = $MarginContainer/VBoxContainer/ScrollContainer
 
-var _actions: Array[String] = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "pause"]
+var _actions: Array[String] = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "defense", "validate", "cancel", "pause"]
 var _actions_cache: Dictionary = {}
 var _waiting_for_input: Button = null
 
@@ -12,6 +13,8 @@ var _waiting_for_input: Button = null
 func _ready() -> void:
 	create_input_buttons()
 	_update_texts()
+	_setup_focus()
+	_setup_scroll_indicators()
 	InputRemapManager.input_remapped.connect(_on_input_remapped)
 	LocalizationManager.language_changed.connect(_on_language_changed)
 
@@ -85,6 +88,13 @@ func _input(event: InputEvent) -> void:
 		_waiting_for_input.text = InputRemapManager.get_first_key_for_action(action)
 		_waiting_for_input = null
 		accept_event()
+	
+	elif event is InputEventJoypadButton and event.pressed:
+		var action = _waiting_for_input.get_meta("action")
+		InputRemapManager.remap_action(action, event)
+		_waiting_for_input.text = InputRemapManager.get_first_key_for_action(action)
+		_waiting_for_input = null
+		accept_event()
 
 
 func _on_input_remapped(_action: String) -> void:
@@ -105,3 +115,20 @@ func _on_reset_button_pressed() -> void:
 
 func _on_back_pressed() -> void:
 	SceneManager.change_scene(GameConstants.SCENE_SETTINGS_MENU)
+
+
+func _setup_focus() -> void:
+	# Donner le focus au premier bouton d'input
+	if inputs_container.get_child_count() > 0:
+		var first_container = inputs_container.get_child(0)
+		if first_container.get_child_count() > 1:
+			var first_button = first_container.get_child(1)
+			if first_button is Button:
+				first_button.grab_focus()
+
+
+func _setup_scroll_indicators() -> void:
+	# Activer la scrollbar verticale avec style visible
+	scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
+	# S'assurer que le scroll suit le focus
+	scroll_container.follow_focus = true

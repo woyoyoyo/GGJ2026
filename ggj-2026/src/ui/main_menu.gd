@@ -7,6 +7,7 @@ func _ready() -> void:
 	AudioManager.play_music(preload(GameConstants.MUSIC_LOGO))
 	_update_texts()
 	_initialize_signals()
+	_setup_focus()
 
 
 func _update_texts() -> void:
@@ -43,3 +44,26 @@ func _on_credits_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()
+
+
+func _setup_focus() -> void:
+	var start_btn = $VBoxContainer/StartButton
+	var settings_btn = $VBoxContainer/SettingsButton
+	var credits_btn = $VBoxContainer/CreditsButton
+	var quit_btn = $VBoxContainer/QuitButton
+	
+	# Définir les voisins pour navigation verticale
+	start_btn.focus_neighbor_top = quit_btn.get_path()
+	start_btn.focus_neighbor_bottom = settings_btn.get_path()
+	
+	settings_btn.focus_neighbor_top = start_btn.get_path()
+	settings_btn.focus_neighbor_bottom = credits_btn.get_path()
+	
+	credits_btn.focus_neighbor_top = settings_btn.get_path()
+	credits_btn.focus_neighbor_bottom = quit_btn.get_path()
+	
+	quit_btn.focus_neighbor_top = credits_btn.get_path()
+	quit_btn.focus_neighbor_bottom = start_btn.get_path()
+	
+	# Donner le focus au premier bouton
+	start_btn.grab_focus()
