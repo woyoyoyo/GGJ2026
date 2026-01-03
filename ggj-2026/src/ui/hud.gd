@@ -15,7 +15,7 @@ func _ready() -> void:
 func _on_score_changed(new_score: int) -> void:
 	score_label.text = "Score: %d" % new_score
 	# Mettre à jour le timer basé sur le score (score = temps * 100)
-	var current_time: int = new_score / 100
+	var current_time: int = new_score / 100.0
 	if current_time != _last_time_displayed:
 		_last_time_displayed = current_time
 		var minutes: int = current_time / 60

@@ -11,6 +11,13 @@ const SCENE_GAME_OVER: String = "res://src/ui/game_over.tscn"
 const SCENE_PAUSE_MENU: String = "res://src/ui/pause_menu.tscn"
 const SCENE_MAIN_GAME: String = "res://src/scenes/main.tscn"
 
+# Collision Layers (Physics 2D)
+const LAYER_PLAYER: int = 1        # Bit 0
+const LAYER_ENEMY: int = 2         # Bit 1
+const LAYER_ENVIRONMENT: int = 4   # Bit 2
+const LAYER_COLLECTIBLE: int = 8   # Bit 3
+const LAYER_HAZARD: int = 16       # Bit 4
+
 # Audio bus names (already hardcoded in your code)
 const AUDIO_BUS_MASTER: String = "Master"
 const AUDIO_BUS_MUSIC: String = "Music"
