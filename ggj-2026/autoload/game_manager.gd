@@ -6,24 +6,31 @@ signal game_started
 signal game_over
 signal score_changed(new_score: int)
 
-var score: int = 0:
+var _score: int = 0
+var score: int:
+	get: return _score
 	set(value):
-		score = value
-		score_changed.emit(score)
+		_score = value
+		score_changed.emit(_score)
 
-var is_game_running: bool = false
+var _is_game_running: bool = false
+var is_game_running: bool:
+	get: return _is_game_running
+	set(value): _is_game_running = value
 
 
 func start_game() -> void:
-	score = 0
-	is_game_running = true
+	_score = 0
+	score_changed.emit(_score)
+	_is_game_running = true
 	game_started.emit()
 
 
 func end_game() -> void:
-	is_game_running = false
+	_is_game_running = false
 	game_over.emit()
 
 
 func add_score(points: int) -> void:
-	score += points
+	_score += points
+	score_changed.emit(_score)

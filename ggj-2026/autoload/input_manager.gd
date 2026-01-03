@@ -4,17 +4,20 @@ extends Node
 
 signal input_changed(device: String)
 
-var using_gamepad: bool = false
+var _using_gamepad: bool = false
+var using_gamepad: bool:
+	get: return _using_gamepad
+	set(value): _using_gamepad = value
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		if not using_gamepad:
-			using_gamepad = true
+		if not _using_gamepad:
+			_using_gamepad = true
 			input_changed.emit("gamepad")
 	elif event is InputEventKey or event is InputEventMouseButton:
-		if using_gamepad:
-			using_gamepad = false
+		if _using_gamepad:
+			_using_gamepad = false
 			input_changed.emit("keyboard")
 
 
