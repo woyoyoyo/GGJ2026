@@ -28,7 +28,7 @@ var attack_timer = 0.0
 @onready var attack_area = $AttackArea
 @onready var attack_shape = $AttackArea/AttackShape
 @onready var attack_sprite = $AttackArea/AttackColorRect
-@onready var sprite = $ColorRect
+@onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
 
 # Get the gravity from the project settings
@@ -76,10 +76,10 @@ func _physics_process(delta):
 	
 	# Flip sprite based on direction
 	if direction > 0:
-		sprite.scale.x = 1
+		sprite.flip_h = false
 		attack_area.position.x = abs(attack_area.position.x)
 	elif direction < 0:
-		sprite.scale.x = -1
+		sprite.flip_h = true
 		attack_area.position.x = -abs(attack_area.position.x)
 	
 	# Handle movement (reduced speed while attacking)

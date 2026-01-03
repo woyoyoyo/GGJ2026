@@ -20,6 +20,10 @@ func _process(delta: float) -> void:
 	if GameManager.is_game_running:
 		_time_elapsed += delta
 		hud.update_timer(_time_elapsed)
+		
+		# Vérifier si le temps est écoulé
+		if _time_elapsed >= GameConstants.GAME_DURATION:
+			GameManager.end_game()
 
 
 func _on_player_died() -> void:

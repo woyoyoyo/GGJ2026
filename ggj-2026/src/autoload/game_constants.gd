@@ -25,3 +25,6 @@ const AUDIO_BUS_SFX: String = "SFX"
 
 # Audio files
 const MUSIC_LOGO: String = "res://assets/music/BranquesInteractive.ogg"
+
+# Game settings
+const GAME_DURATION: float = 180.0  # 3 minutes (en secondes)
