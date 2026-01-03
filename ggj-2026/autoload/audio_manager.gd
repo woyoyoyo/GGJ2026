@@ -5,8 +5,17 @@ extends Node
 @onready var music_player := AudioStreamPlayer.new()
 @onready var sfx_player := AudioStreamPlayer.new()
 
-var music_volume: float = 0.8
-var sfx_volume: float = 1.0
+var _music_volume: float = 0.8
+var music_volume: float:
+	get: return _music_volume
+	set(value): _music_volume = value
+
+var _sfx_volume: float = 1.0
+var sfx_volume: float:
+	get: return _sfx_volume
+	set(value): _sfx_volume = value
+
+var _fade_tween: Tween = null
 
 
 func _ready() -> void:
@@ -30,8 +39,8 @@ func load_audio_settings() -> void:
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("SFX"), linear_to_db(saved_sfx_volume))
 	
 	# Sauvegarder dans les variables
-	music_volume = saved_music_volume
-	sfx_volume = saved_sfx_volume
+	_music_volume = saved_music_volume
+	_sfx_volume = saved_sfx_volume
 
 
 func play_music(stream: AudioStream, fade_in: bool = true) -> void:
@@ -39,27 +48,31 @@ func play_music(stream: AudioStream, fade_in: bool = true) -> void:
 		music_player.volume_db = -80
 		music_player.stream = stream
 		music_player.play()
-		var tween = create_tween()
-		tween.tween_property(music_player, "volume_db", linear_to_db(music_volume), 1.0)
+		if _fade_tween:
+			_fade_tween.kill()
+		_fade_tween = create_tween()
+		_fade_tween.tween_property(music_player, "volume_db", linear_to_db(_music_volume), 1.0)
 	else:
 		music_player.stream = stream
-		music_player.volume_db = linear_to_db(music_volume)
+		music_player.volume_db = linear_to_db(_music_volume)
 		music_player.play()
 
 
 func stop_music(fade_out: bool = true) -> void:
 	if fade_out:
-		var tween = create_tween()
-		tween.tween_property(music_player, "volume_db", -80, 1.0)
-		tween.tween_callback(music_player.stop)
+		if _fade_tween:
+			_fade_tween.kill()
+		_fade_tween = create_tween()
+		_fade_tween.tween_property(music_player, "volume_db", -80, 1.0)
+		_fade_tween.tween_callback(music_player.stop)
 	else:
 		music_player.stop()
 
 
 func play_sfx(stream: AudioStream) -> void:
-	var player = AudioStreamPlayer.new()
+	var player := AudioStreamPlayer.new()
 	player.stream = stream
-	player.volume_db = linear_to_db(sfx_volume)
+	player.volume_db = linear_to_db(_sfx_volume)
 	player.bus = "SFX"
 	add_child(player)
 	player.play()
