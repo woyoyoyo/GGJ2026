@@ -9,11 +9,13 @@ ggj-2026/
 │   ├── sounds/      # Effets sonores
 │   ├── music/       # Musiques de fond
 │   └── fonts/       # Polices de caractères
-├── scenes/          # Scènes principales du jeu
-├── levels/          # Niveaux du jeu
-├── scripts/         # Scripts réutilisables (player, enemy, etc.)
-├── ui/              # Interfaces utilisateur (menus, HUD)
-├── autoload/        # Scripts singleton (GameManager, etc.)
+├── publish/         # Fichiers de publication
+├── src/             # Sources
+│   ├── scenes/      # Scènes principales du jeu
+│   ├── levels/      # Niveaux du jeu
+│   ├── scripts/     # Scripts réutilisables (player, enemy, etc.)
+│   ├── ui/          # Interfaces utilisateur (menus, HUD)
+│   ├── autoload/    # Scripts singleton (GameManager, etc.)
 └── project.godot    # Configuration du projet
 ```
 
@@ -39,7 +41,7 @@ ggj-2026/
 ## Quick Start
 
 1. Ouvrir le projet dans Godot
-2. La scène de démarrage est `ui/main_menu.tscn`
+2. La scène de démarrage est `src/ui/main_menu.tscn`
 3. Utiliser les managers : `GameManager.start_game()`, `AudioManager.play_music()`, etc.
 4. Ajouter le HUD et PauseMenu dans vos scènes de jeu
 
@@ -53,7 +55,7 @@ GameManager.start_game()
 AudioManager.play_music(preload("res://assets/music/theme.ogg"))
 
 # Changer de scène
-SceneManager.change_scene("res://levels/level_1.tscn")
+SceneManager.change_scene(GameConstants.NAME_OF_THE_SCENE)
 
 # Ajouter un composant de santé
 var health = $HealthComponent
