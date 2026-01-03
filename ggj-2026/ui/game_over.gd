@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+class_name GameOver
+
 @onready var control: Control = $Control
 @onready var title_label: Label = $Control/VBoxContainer/Title
 @onready var score_label: Label = $Control/VBoxContainer/ScoreLabel
@@ -18,7 +20,7 @@ func _ready() -> void:
 	_update_texts()
 
 
-func _update_texts() -> void:
+func _update_texts(_locale: String = "") -> void:
 	title_label.text = tr("GAME_OVER_TITLE")
 	restart_button.text = tr("GAME_OVER_REPLAY")
 	main_menu_button.text = tr("PAUSE_MAIN_MENU")

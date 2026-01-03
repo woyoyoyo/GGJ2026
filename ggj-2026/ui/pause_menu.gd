@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+class_name PauseMenu
+
 
 func _ready() -> void:
 	hide()

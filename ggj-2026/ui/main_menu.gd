@@ -1,13 +1,12 @@
 extends Control
 
+class_name MainMenu
+
 
 func _ready() -> void:
+	AudioManager.play_music(preload("res://assets/music/BranquesInteractive.ogg"))
 	_update_texts()
-	LocalizationManager.language_changed.connect(_on_language_changed)
-	$VBoxContainer/StartButton.pressed.connect(_on_start_pressed)
-	$VBoxContainer/SettingsButton.pressed.connect(_on_settings_pressed)
-	$VBoxContainer/CreditsButton.pressed.connect(_on_credits_pressed)
-	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
+	_initialize_signals()
 
 
 func _update_texts() -> void:
@@ -16,6 +15,14 @@ func _update_texts() -> void:
 	$VBoxContainer/SettingsButton.text = tr("BTN_SETTINGS")
 	$VBoxContainer/CreditsButton.text = tr("BTN_CREDITS")
 	$VBoxContainer/QuitButton.text = tr("BTN_QUIT")
+
+
+func _initialize_signals() -> void:
+	LocalizationManager.language_changed.connect(_on_language_changed)
+	$VBoxContainer/StartButton.pressed.connect(_on_start_pressed)
+	$VBoxContainer/SettingsButton.pressed.connect(_on_settings_pressed)
+	$VBoxContainer/CreditsButton.pressed.connect(_on_credits_pressed)
+	$VBoxContainer/QuitButton.pressed.connect(_on_quit_pressed)
 
 
 func _on_language_changed(_locale: String) -> void:

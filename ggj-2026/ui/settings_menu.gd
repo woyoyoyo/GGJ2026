@@ -1,5 +1,7 @@
 extends Control
 
+class_name SettingsMenu
+
 @onready var master_slider: HSlider = $MarginContainer/VBoxContainer/AudioSection/MasterSlider
 @onready var music_slider: HSlider = $MarginContainer/VBoxContainer/AudioSection/MusicSlider
 @onready var sfx_slider: HSlider = $MarginContainer/VBoxContainer/AudioSection/SFXSlider
