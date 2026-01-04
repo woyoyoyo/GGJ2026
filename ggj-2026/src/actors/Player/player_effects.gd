@@ -21,17 +21,36 @@ class_name PlayerEffects
 
 @onready var _particle_manager: ParticleManager = $ParticleManager
 
-# Player-specific particle scenes
+# === PARTICLE SCENE REFERENCES ===
 @export_group("Particle Scenes")
 @export var jump_particles: PackedScene
 @export var land_particles: PackedScene
+@export var dash_burst_particles: PackedScene
+
+# === DASH TRAIL SETTINGS ===
+@export_group("Dash Trail")
+@export var dash_trail_enabled: bool = true
+@export var dash_trail_length: int = 10
+@export var dash_trail_spacing: float = 0.02
+@export var dash_trail_color: Color = Color.WHITE
+var _dash_trail_timer: float = 0.0
+var _is_dashing: bool = false
 
 var _player: PlayerController
+
 
 func _ready() -> void:
 	# Get player reference
 	_player = get_parent() as PlayerController
 	_connect_signals()
+
+
+func _process(delta: float) -> void:
+	if not _player:
+		return
+
+	_update_dash_trail(delta)
+
 
 ## Connect to all player signals
 func _connect_signals() -> void:
@@ -39,11 +58,15 @@ func _connect_signals() -> void:
 	_player.landed.connect(_on_player_landed)
 	_player.died.connect(_on_player_died)
 	_player.respawned.connect(_on_player_respawned)
+	_player.dashed.connect(_on_player_dashed)
+	_player.dash_recharged.connect(_on_dash_recharged)
+
 
 ## === MOVEMENT EFFECTS ===
 func _on_player_jumped() -> void:
 	var pos := _player.global_position + Vector2(0, 8)
 	_particle_manager.spawn_particle(jump_particles, pos, Vector2.DOWN)
+
 
 func _on_player_landed() -> void:
 	var pos := _player.global_position + Vector2(0, 8)
@@ -54,9 +77,96 @@ func _on_player_landed() -> void:
 
 	_particle_manager.spawn_particle(land_particles, pos, Vector2.DOWN, scale_multiplier)
 
+
 ## === STATUS EFFECTS ===
 func _on_player_died() -> void:
 	_particle_manager.cleanup_all_particles()
 
+
 func _on_player_respawned() -> void:
 	_particle_manager.cleanup_all_particles()
+
+
+## === DASH EFFECTS ===
+func _on_player_dashed() -> void:
+	_is_dashing = true
+	_dash_trail_timer = 0.0
+
+	# Spawn burst at dash start
+	if dash_burst_particles:
+		var direction := -_player._dash_direction # Opposite of dash direction
+		_particle_manager.spawn_particle(dash_burst_particles, _player.global_position, direction)
+
+
+func _on_dash_recharged() -> void:
+	# Could spawn subtle sparkle effect
+	pass
+
+
+## Update dash trail (continuous effect during dash)
+func _update_dash_trail(delta: float) -> void:
+	# Check if player is dashing
+	var is_currently_dashing := _player._is_dashing
+
+	if is_currently_dashing and not _is_dashing:
+		_is_dashing = true
+		_dash_trail_timer = 0.0
+	elif not is_currently_dashing:
+		_is_dashing = false
+		return
+
+	if not dash_trail_enabled or not _is_dashing:
+		return
+
+	_dash_trail_timer -= delta
+
+	if _dash_trail_timer <= 0:
+		_dash_trail_timer = dash_trail_spacing
+		_spawn_dash_trail_sprite()
+
+
+## Spawns a dash trail sprite (afterimage effect)
+func _spawn_dash_trail_sprite() -> void:
+	if not _player.sprite:
+		return
+
+	# Get parent for trail sprite
+	var parent := _get_trail_parent()
+	if not parent:
+		return
+
+	# Create afterimage sprite
+	var trail_sprite := Sprite2D.new()
+	trail_sprite.texture = _player.sprite.texture
+	trail_sprite.hframes = _player.sprite.hframes
+	trail_sprite.vframes = _player.sprite.vframes
+	trail_sprite.frame = _player.sprite.frame
+	trail_sprite.flip_h = _player.sprite.flip_h
+	trail_sprite.scale = _player.sprite.scale
+	trail_sprite.modulate = dash_trail_color
+	trail_sprite.modulate.a = 0.6
+
+	parent.add_child(trail_sprite)
+	trail_sprite.global_position = _player.sprite.global_position
+
+	# Fade out and cleanup
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(trail_sprite, "modulate:a", 0.0, 0.3)
+	tween.tween_property(trail_sprite, "scale", _player.sprite.scale * 0.8, 0.3)
+	tween.finished.connect(trail_sprite.queue_free)
+
+
+## Gets the best parent node for spawning trail sprites
+func _get_trail_parent() -> Node:
+	# Try current scene first
+	var scene_tree := get_tree()
+	if scene_tree and scene_tree.current_scene:
+		return scene_tree.current_scene
+
+	# Fallback to scene root
+	if scene_tree and scene_tree.root:
+		return scene_tree.root
+
+	# Last resort: use this node (trails will move with player)
+	return self

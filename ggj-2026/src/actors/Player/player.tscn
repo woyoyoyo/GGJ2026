@@ -24,6 +24,7 @@ script = ExtResource("1_player")
 script = ExtResource("2_qdvcd")
 jump_particles = ExtResource("3_6llfm")
 land_particles = ExtResource("4_hod3v")
+dash_burst_particles = ExtResource("3_6llfm")
 
 [node name="ParticleManager" type="Node2D" parent="PlayerEffects"]
 script = ExtResource("6_dmu6e")

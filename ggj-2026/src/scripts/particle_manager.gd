@@ -16,8 +16,10 @@ class_name ParticleManager
 var _particle_pool: Dictionary = {}
 const POOL_SIZE: int = 20
 
+
 func _ready() -> void:
 	pass # Pool initialized on-demand
+
 
 ## Spawns a particle effect at a position with optional dynamic parameters
 ## @param scene: The PackedScene containing a GPUParticles2D node
@@ -38,6 +40,7 @@ func spawn_particle(
 		return
 
 	_spawn_particles(scene, pos, direction, scale_multiplier, custom_modulate, amount_multiplier)
+
 
 ## Cleanup all active particles (call on scene change/reset, when player dies and respawns)
 func cleanup_all_particles() -> void:
@@ -61,6 +64,7 @@ func _get_particle_parent() -> Node:
 
 	# Last resort: use this node as parent (particles will move with entity)
 	return self
+
 
 ## Spawns particles at a position (uses pooling)
 func _spawn_particles(
@@ -123,6 +127,7 @@ func _spawn_particles(
 		if not particles.finished.is_connected(_on_particle_finished):
 			particles.finished.connect(_on_particle_finished.bind(particles, scene))
 
+
 ## Get particle from pool or create new
 func _get_pooled_particle(scene: PackedScene) -> GPUParticles2D:
 	if scene not in _particle_pool:
@@ -141,6 +146,7 @@ func _get_pooled_particle(scene: PackedScene) -> GPUParticles2D:
 	if debug_mode:
 		print("🆕 Creating new particle (pool size: ", pool.size(), ")")
 	return null
+
 
 ## Return particle to pool when finished
 func _on_particle_finished(particle: GPUParticles2D, scene: PackedScene) -> void:
