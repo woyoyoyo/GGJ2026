@@ -65,6 +65,17 @@ func _physics_process(delta: float) -> void:
 ### Optimization Techniques
 1. **Object pooling** for frequently spawned/despawned nodes
 2. **Process modes**: Use `_process()` vs `_physics_process()` appropriately
+`_process()`: called every frame and used for non-physics logic, including but not limited to:
+    - UI updates and animations (e.g., fading a panel, rotating a coin sprite)
+    - checking whether the player has damage
+    - general game logic not tied to physics (updating score, checking win/lose conditions, state machines)
+    - playing animations or particle effects
+    - reading player input for immediate non-physics responses (e.g., menu navigation, button clicks)
+`_physics_process()`: called at a fixed rate and used for physics-related logic, including but not limited to:
+	- Moving physics bodies (e.g., `CharacterBody2D/3D` movement, `RigidBody` forces)
+	- Handling collisions or raycasts
+	- Applying forces, impulses, or gravity to objects
+	- Any gameplay logic that must be in sync with physics (e.g., timing a jump recharge or resetting a player’s double-jump, only when they physically land on the ground)
 3. **VisibleOnScreenNotifier2D** to disable off-screen processing
 4. **MultiMeshInstance2D** for rendering large sprite counts
 5. **Batching**: Keep sprites under same material, avoid shader variations
