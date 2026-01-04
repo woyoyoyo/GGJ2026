@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://bqy3xv8jmn6gp"]
+[gd_scene load_steps=10 format=3 uid="uid://bqy3xv8jmn6gp"]
 
 [ext_resource type="Script" uid="uid://b3mx7yeavjcym" path="res://src/actors/player/player.gd" id="1_player"]
 [ext_resource type="Script" uid="uid://cqnjn3p74x8hy" path="res://src/actors/player/player_effects.gd" id="2_qdvcd"]
 [ext_resource type="PackedScene" uid="uid://c357twnhlsi0x" path="res://src/actors/player/particles/jump_particles.tscn" id="3_6llfm"]
 [ext_resource type="Script" uid="uid://bobwboiyxpw1q" path="res://src/actors/player/player_sounds.gd" id="3_xj70e"]
 [ext_resource type="PackedScene" uid="uid://dn2x4qw5cj2ev" path="res://src/actors/player/particles/land_particles.tscn" id="4_hod3v"]
+[ext_resource type="Script" uid="uid://bnef08cjc2l1j" path="res://src/scripts/particle_manager.gd" id="6_dmu6e"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_player"]
 size = Vector2(32, 64)
@@ -53,6 +54,9 @@ position_smoothing_enabled = true
 script = ExtResource("2_qdvcd")
 jump_particles = ExtResource("3_6llfm")
 land_particles = ExtResource("4_hod3v")
+
+[node name="ParticleManager" type="Node2D" parent="PlayerEffects"]
+script = ExtResource("6_dmu6e")
 
 [node name="PlayerSounds" type="Node" parent="."]
 script = ExtResource("3_xj70e")
