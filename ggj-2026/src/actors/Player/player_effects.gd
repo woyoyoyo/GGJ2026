@@ -26,6 +26,8 @@ class_name PlayerEffects
 @export var jump_particles: PackedScene
 @export var land_particles: PackedScene
 @export var dash_burst_particles: PackedScene
+@export var wall_slide_particles: PackedScene
+@export var wall_jump_particles: PackedScene
 
 # === DASH TRAIL SETTINGS ===
 @export_group("Dash Trail")
@@ -35,6 +37,12 @@ class_name PlayerEffects
 @export var dash_trail_color: Color = Color.WHITE
 var _dash_trail_timer: float = 0.0
 var _is_dashing: bool = false
+
+# === WALL SLIDE SETTINGS ===
+@export_group("Wall Slide")
+@export var wall_slide_particle_rate: float = 0.05  # Spawn every 0.05 seconds
+var _wall_slide_timer: float = 0.0
+
 
 var _player: PlayerController
 
@@ -50,16 +58,20 @@ func _process(delta: float) -> void:
 		return
 
 	_update_dash_trail(delta)
+	_update_wall_slide_particles(delta)
 
 
 ## Connect to all player signals
 func _connect_signals() -> void:
+	# Movement signals
 	_player.jumped.connect(_on_player_jumped)
 	_player.landed.connect(_on_player_landed)
 	_player.died.connect(_on_player_died)
 	_player.respawned.connect(_on_player_respawned)
 	_player.dashed.connect(_on_player_dashed)
 	_player.dash_recharged.connect(_on_dash_recharged)
+	_player.wall_jumped.connect(_on_player_wall_jumped)
+	_player.wall_slide_started.connect(_on_wall_slide_started)
 
 
 ## === MOVEMENT EFFECTS ===
@@ -76,6 +88,34 @@ func _on_player_landed() -> void:
 	var scale_multiplier: float = clamp(fall_velocity / 500.0, 0.5, 2.0)
 
 	_particle_manager.spawn_particle(land_particles, pos, Vector2.DOWN, scale_multiplier)
+
+
+## === WALLS EFFECTS ===
+func _on_player_wall_jumped() -> void:
+	if wall_jump_particles:
+		var spawn_pos := _player.global_position
+		var direction := Vector2(_player.velocity.x, 0).normalized()
+		_particle_manager.spawn_particle(wall_jump_particles, spawn_pos, direction)
+
+
+func _on_wall_slide_started() -> void:
+	_wall_slide_timer = 0.0
+
+
+## Update wall slide particles (continuous effect)
+func _update_wall_slide_particles(delta: float) -> void:
+	if not _player._is_wall_sliding or not wall_slide_particles:
+		return
+
+	_wall_slide_timer -= delta
+
+	if _wall_slide_timer <= 0:
+		_wall_slide_timer = wall_slide_particle_rate
+
+		# Spawn particles on the wall side
+		var wall_direction := Vector2(-sign(_player.velocity.x), 0)
+		var spawn_pos := _player.global_position + wall_direction * 8
+		_particle_manager.spawn_particle(wall_slide_particles, spawn_pos, wall_direction)
 
 
 ## === STATUS EFFECTS ===

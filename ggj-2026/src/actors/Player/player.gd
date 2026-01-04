@@ -17,7 +17,6 @@ signal landed
 signal dashed
 signal dash_recharged
 signal wall_slide_started
-signal wall_slide_ended
 
 # Combat
 signal attack_started
@@ -90,9 +89,11 @@ var _wall_normal: Vector2 = Vector2.ZERO
 @export var enable_dash: bool = true
 @export var enable_wall_mechanics: bool = true
 
+
 func _ready() -> void:
 	# Initialize dash count
 	_dashes_remaining = MAX_DASHES
+
 
 func _physics_process(delta: float) -> void:
 	# Update timers first
@@ -124,6 +125,7 @@ func _physics_process(delta: float) -> void:
 	_update_dash_recharge()
 	_update_sprite_direction()
 
+
 ## Updates all timers
 func _update_timers(delta: float) -> void:
 	# Attack timer
@@ -154,6 +156,7 @@ func _update_timers(delta: float) -> void:
 	if _dash_cooldown_timer > 0:
 		_dash_cooldown_timer -= delta
 
+
 ## Applies gravity with variable fall speed (Celeste-style)
 func _apply_gravity(delta: float) -> void:
 	if is_on_floor():
@@ -172,6 +175,7 @@ func _apply_gravity(delta: float) -> void:
 	# Wall slide reduces fall speed
 	if _is_wall_sliding:
 		velocity.y = min(velocity.y, WALL_SLIDE_SPEED)
+
 
 ## Handles jump input with coyote time, jump buffer, and variable height
 func _handle_jump_input() -> void:
@@ -198,10 +202,12 @@ func _handle_jump_input() -> void:
 		if velocity.y < 0: # Only if moving upward
 			velocity.y *= JUMP_CUT_MULTIPLIER
 
+
 ## Performs a normal jump
 func _perform_jump() -> void:
 	velocity.y = JUMP_VELOCITY
 	jumped.emit()
+
 
 ## Performs a wall jump
 func _perform_wall_jump() -> void:
@@ -209,8 +215,8 @@ func _perform_wall_jump() -> void:
 	velocity.x = _wall_normal.x * WALL_JUMP_VELOCITY.x
 	velocity.y = WALL_JUMP_VELOCITY.y
 	_is_wall_sliding = false
-	wall_slide_ended.emit()
 	wall_jumped.emit()
+
 
 ## Handles dash input and execution
 func _handle_dash_input() -> void:
@@ -221,6 +227,7 @@ func _handle_dash_input() -> void:
 	if Input.is_action_just_pressed("action"):
 		if _dashes_remaining > 0 and _dash_cooldown_timer <= 0:
 			_perform_dash()
+
 
 ## Performs a dash in the input direction
 func _perform_dash() -> void:
@@ -243,9 +250,11 @@ func _perform_dash() -> void:
 
 	dashed.emit()
 
+
 ## Handles movement during dash
 func _handle_dash_movement(_delta: float) -> void:
 	velocity = _dash_direction * DASH_SPEED
+
 
 ## Ends the dash state
 func _end_dash() -> void:
@@ -254,12 +263,12 @@ func _end_dash() -> void:
 	# Preserve some momentum
 	velocity *= 0.5
 
+
 ## Updates wall slide state
 func _update_wall_slide() -> void:
 	if is_on_floor() or _is_dashing:
 		if _is_wall_sliding:
 			_is_wall_sliding = false
-			wall_slide_ended.emit()
 		return
 
 	# Check for wall contact
@@ -278,8 +287,6 @@ func _update_wall_slide() -> void:
 			if not was_wall_sliding:
 				wall_slide_started.emit()
 
-	if was_wall_sliding and not _is_wall_sliding:
-		wall_slide_ended.emit()
 
 ## Recharges dash when on floor or wall
 func _update_dash_recharge() -> void:
@@ -287,6 +294,7 @@ func _update_dash_recharge() -> void:
 		if _dashes_remaining < MAX_DASHES:
 			_dashes_remaining = MAX_DASHES
 			dash_recharged.emit()
+
 
 ## Handles horizontal movement with acceleration/friction
 func _handle_horizontal_movement(delta: float) -> void:
@@ -309,6 +317,7 @@ func _handle_horizontal_movement(delta: float) -> void:
 		var friction_value := FRICTION if is_on_floor() else AIR_FRICTION
 		velocity.x = move_toward(velocity.x, 0, friction_value * delta)
 
+
 ## Updates sprite flip based on movement direction
 func _update_sprite_direction() -> void:
 	# Only update direction if moving significantly or has input
@@ -321,10 +330,12 @@ func _update_sprite_direction() -> void:
 		sprite.flip_h = true
 		attack_area.position.x = - abs(attack_area.position.x)
 
+
 ## Handles attack input
 func _handle_attack_input() -> void:
 	if Input.is_action_just_pressed("attack") and not _is_attacking:
 		_start_attack()
+
 
 ## Starts an attack
 func _start_attack() -> void:
@@ -342,6 +353,7 @@ func _start_attack() -> void:
 		if attack_sprite:
 			attack_sprite.visible = true
 
+
 ## Ends an attack
 func _end_attack() -> void:
 	_is_attacking = false
@@ -354,6 +366,7 @@ func _end_attack() -> void:
 		if attack_sprite:
 			attack_sprite.visible = false
 
+
 ## Called when attack hits - can be triggered by animation or manually
 func _on_attack_hit() -> void:
 	if not attack_area:
@@ -365,6 +378,7 @@ func _on_attack_hit() -> void:
 			body.take_damage(10)
 			attack_hit.emit(body)
 
+
 ## Respawns the player at a specific position
 func respawn(spawn_position: Vector2) -> void:
 	global_position = spawn_position
@@ -375,6 +389,7 @@ func respawn(spawn_position: Vector2) -> void:
 	_dashes_remaining = MAX_DASHES
 	respawned.emit(spawn_position)
 
+
 ## Handles taking damage (optional health system integration)
 func take_damage(damage: int) -> void:
 	# This is a placeholder - implement your health system here
@@ -384,6 +399,7 @@ func take_damage(damage: int) -> void:
 	# if _health <= 0:
 	#     die()
 	took_damage.emit(damage, 0)  # Placeholder with 0 health
+
 
 ## Triggers death
 func die() -> void:
