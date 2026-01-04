@@ -1,15 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://bqy3xv8jmn6gp"]
+[gd_scene load_steps=7 format=3 uid="uid://bqy3xv8jmn6gp"]
 
-[ext_resource type="Script" uid="uid://b3mx7yeavjcym" path="res://src/scripts/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://b3mx7yeavjcym" path="res://src/actors/Player/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://cqnjn3p74x8hy" path="res://src/actors/Player/player_effects.gd" id="2_qdvcd"]
+[ext_resource type="Script" uid="uid://bobwboiyxpw1q" path="res://src/actors/Player/player_sounds.gd" id="3_xj70e"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_player"]
+size = Vector2(32, 64)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
 size = Vector2(32, 64)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_attack"]
 size = Vector2(48, 32)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_player"]
-size = Vector2(32, 64)
 
 [node name="Player" type="CharacterBody2D"]
 collision_mask = 4
@@ -42,7 +44,11 @@ color = Color(1, 0.2, 0.2, 0.5)
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 
 [node name="Camera2D" type="Camera2D" parent="."]
-enabled = true
-position_smoothing_enabled = true
-position_smoothing_speed = 5.0
 offset = Vector2(0, -50)
+position_smoothing_enabled = true
+
+[node name="PlayerEffects" type="Node" parent="."]
+script = ExtResource("2_qdvcd")
+
+[node name="PlayerSounds" type="Node" parent="."]
+script = ExtResource("3_xj70e")
