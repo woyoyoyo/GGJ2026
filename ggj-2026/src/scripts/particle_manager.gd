@@ -82,7 +82,16 @@ func _spawn_particles(
 	if not particles:
 		return
 
-	# Configure particles
+	# Add to scene first - IMPORTANT: Must add before setting global_position
+	var parent := _get_particle_parent()
+	if not parent:
+		push_warning("ParticleManager: No valid parent found for particles")
+		particles.queue_free()
+		return
+
+	parent.add_child(particles)
+
+	# Configure particles AFTER adding to scene tree
 	particles.global_position = pos
 	particles.scale = Vector2.ONE * particle_scale * scale_multiplier
 
@@ -99,20 +108,15 @@ func _spawn_particles(
 		var original_amount := particles.amount
 		particles.amount = int(original_amount * amount_multiplier)
 
-	particles.emitting = true
-
 	# Rotate based on direction if provided
 	if direction.length() > 0:
 		particles.rotation = direction.angle()
 
-	# Add to scene - try multiple parent options
-	var parent := _get_particle_parent()
-	if not parent:
-		push_warning("ParticleManager: No valid parent found for particles")
-		particles.queue_free()
-		return
+	# CRITICAL: Restart particle system to clear old cached position
+	particles.restart()
 
-	parent.add_child(particles)
+	# Start emitting (must be last to ensure proper position)
+	particles.emitting = true
 
 	# Auto-cleanup when finished (check if not already connected)
 	if particles.one_shot:

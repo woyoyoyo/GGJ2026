@@ -20,6 +20,14 @@ size = Vector2(48, 32)
 collision_mask = 4
 script = ExtResource("1_player")
 
+[node name="PlayerEffects" type="Node2D" parent="."]
+script = ExtResource("2_qdvcd")
+jump_particles = ExtResource("3_6llfm")
+land_particles = ExtResource("4_hod3v")
+
+[node name="ParticleManager" type="Node2D" parent="PlayerEffects"]
+script = ExtResource("6_dmu6e")
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -32)
 texture = SubResource("PlaceholderTexture2D_player")
@@ -49,14 +57,6 @@ color = Color(1, 0.2, 0.2, 0.5)
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(0, -50)
 position_smoothing_enabled = true
-
-[node name="PlayerEffects" type="Node2D" parent="."]
-script = ExtResource("2_qdvcd")
-jump_particles = ExtResource("3_6llfm")
-land_particles = ExtResource("4_hod3v")
-
-[node name="ParticleManager" type="Node2D" parent="PlayerEffects"]
-script = ExtResource("6_dmu6e")
 
 [node name="PlayerSounds" type="Node" parent="."]
 script = ExtResource("3_xj70e")
