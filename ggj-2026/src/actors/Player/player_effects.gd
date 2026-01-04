@@ -28,6 +28,8 @@ class_name PlayerEffects
 @export var dash_burst_particles: PackedScene
 @export var wall_slide_particles: PackedScene
 @export var wall_jump_particles: PackedScene
+@export var attack_trail_particles: PackedScene
+@export var hit_impact_particles: PackedScene
 
 # === DASH TRAIL SETTINGS ===
 @export_group("Dash Trail")
@@ -72,6 +74,10 @@ func _connect_signals() -> void:
 	_player.dash_recharged.connect(_on_dash_recharged)
 	_player.wall_jumped.connect(_on_player_wall_jumped)
 	_player.wall_slide_started.connect(_on_wall_slide_started)
+
+	# Combat signals
+	_player.attack_started.connect(_on_attack_started)
+	_player.attack_hit.connect(_on_attack_hit)
 
 
 ## === MOVEMENT EFFECTS ===
@@ -210,3 +216,18 @@ func _get_trail_parent() -> Node:
 
 	# Last resort: use this node (trails will move with player)
 	return self
+
+
+## === COMBAT EFFECTS ===
+
+## Called when attack starts
+func _on_attack_started() -> void:
+	# Could spawn weapon trail particles
+	pass
+
+## Called when attack hits enemy
+func _on_attack_hit(target: Node2D) -> void:
+	if hit_impact_particles and is_instance_valid(target):
+		var hit_pos := target.global_position
+		var direction := (_player.global_position.direction_to(hit_pos))
+		_particle_manager.spawn_particle(hit_impact_particles, hit_pos, direction)

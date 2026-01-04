@@ -27,6 +27,8 @@ land_particles = ExtResource("4_hod3v")
 dash_burst_particles = ExtResource("3_6llfm")
 wall_slide_particles = ExtResource("4_hod3v")
 wall_jump_particles = ExtResource("3_6llfm")
+attack_trail_particles = ExtResource("3_6llfm")
+hit_impact_particles = ExtResource("4_hod3v")
 
 [node name="ParticleManager" type="Node2D" parent="PlayerEffects"]
 script = ExtResource("6_dmu6e")
