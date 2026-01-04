@@ -218,7 +218,7 @@ func _handle_dash_input() -> void:
 		return
 
 	# Check if can dash
-	if Input.is_action_just_pressed("dash"):
+	if Input.is_action_just_pressed("action"):
 		if _dashes_remaining > 0 and _dash_cooldown_timer <= 0:
 			_perform_dash()
 
