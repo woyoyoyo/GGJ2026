@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://bqy3xv8jmn6gp"]
 
-[ext_resource type="Script" uid="uid://b3mx7yeavjcym" path="res://src/actors/Player/player.gd" id="1_player"]
-[ext_resource type="Script" uid="uid://cqnjn3p74x8hy" path="res://src/actors/Player/player_effects.gd" id="2_qdvcd"]
-[ext_resource type="Script" uid="uid://bobwboiyxpw1q" path="res://src/actors/Player/player_sounds.gd" id="3_xj70e"]
+[ext_resource type="Script" uid="uid://b3mx7yeavjcym" path="res://src/actors/player/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://cqnjn3p74x8hy" path="res://src/actors/player/player_effects.gd" id="2_qdvcd"]
+[ext_resource type="Script" uid="uid://bobwboiyxpw1q" path="res://src/actors/player/player_sounds.gd" id="3_xj70e"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_player"]
 size = Vector2(32, 64)
