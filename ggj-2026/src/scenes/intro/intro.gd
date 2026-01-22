@@ -1,27 +1,52 @@
 extends Node2D
 
-var EcranTitre = "res://src/ui/main_menu.tscn"
+const RAINBOW_SPEED: float = 1200.0 # Pixels par seconde
+const RAINBOW_TRIGGER_Y: float = 1050.0
 
-# Called when the node enters the scene tree for the first time.
+@onready var rainbow: Sprite2D = $ArcEnCiel
+@onready var background_color: Sprite2D = $BackgroundCouleur
+@onready var background_bw: Sprite2D = $BackgroundNoirEtBlanc
+@onready var intro_sound: AudioStreamPlayer = $SonIntro
+@onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var logo: Sprite2D = $Sprite2D
+
+
 func _ready() -> void:
-	$BackgroundNoirEtBlanc.visible = true
-	$BackgroundCouleur.visible = false
+	background_bw.visible = true
+	background_color.visible = false
+	
+	# Précharger et jouer la musique via AudioManager
+	AudioManager.play_music(preload(GameConstants.MUSIC_LOGO))
+	
+	# Attendre 3 secondes puis faire apparaître le logo progressivement
+	await get_tree().create_timer(2.7).timeout
+	
+	# Fade in du logo (1 seconde) en utilisant le paramètre alpha du shader
+	var tween := create_tween()
+	tween.tween_property(logo.material, "shader_parameter/alpha", 1.0, 1.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await tween.finished
+	
+	# Puis lancer l'effet shine
+	animation_player.play("LogoShine")
 
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(_delta: float) -> void:
-	$ArcEnCiel.position.y += 20
-
-	if $ArcEnCiel.position.y > 1050:
-		$BackgroundCouleur.visible = true
-		$BackgroundNoirEtBlanc.visible = true
+func _process(delta: float) -> void:
+	rainbow.position.y += RAINBOW_SPEED * delta
+	
+	if rainbow.position.y > RAINBOW_TRIGGER_Y:
+		background_color.visible = true
+		background_bw.visible = true
 
 
-func _input(event):
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("validate"):
-		$SonIntro.stop()
-		_on_son_intro_finished()
+		intro_sound.stop()
+		_go_to_menu()
+
 
 func _on_son_intro_finished() -> void:
-	get_tree().change_scene_to_file(EcranTitre)
+	_go_to_menu()
+
+
+func _go_to_menu() -> void:
+	SceneManager.change_scene(GameConstants.SCENE_MAIN_MENU)
