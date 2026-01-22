@@ -9,7 +9,7 @@ const SCENE_CONTROLS_SETTINGS: String = "res://src/ui/controls_settings.tscn"
 const SCENE_CREDITS_MENU: String = "res://src/ui/credits_menu.tscn"
 const SCENE_GAME_OVER: String = "res://src/ui/game_over.tscn"
 const SCENE_PAUSE_MENU: String = "res://src/ui/pause_menu.tscn"
-const SCENE_MAIN_GAME: String = "res://src/scenes/main.tscn"
+const SCENE_MAIN_GAME: String = "res://src/scenes/main/main.tscn"
 
 # Collision Layers (Physics 2D)
 const LAYER_PLAYER: int = 1 # Bit 0
