@@ -40,10 +40,9 @@ class_name PlayerEffects
 var _dash_trail_timer: float = 0.0
 var _is_dashing: bool = false
 
-# === WALL SLIDE SETTINGS ===
-@export_group("Wall Slide")
-@export var wall_slide_particle_rate: float = 0.05  # Spawn every 0.05 seconds
-var _wall_slide_timer: float = 0.0
+# === WALL SLIDE SETTINGS === (DÉSACTIVÉ)
+# @export_group("Wall Slide")
+# @export var wall_slide_particle_rate: float = 0.05  # Spawn every 0.05 seconds
 
 
 var _player: PlayerController
@@ -60,68 +59,66 @@ func _process(delta: float) -> void:
 		return
 
 	_update_dash_trail(delta)
-	_update_wall_slide_particles(delta)
+	# Wall slide particles désactivés (fonctionnalité non disponible)
+	# _update_wall_slide_particles(delta)
 
 
 ## Connect to all player signals
 func _connect_signals() -> void:
 	# Movement signals
-	_player.jumped.connect(_on_player_jumped)
-	_player.landed.connect(_on_player_landed)
 	_player.died.connect(_on_player_died)
 	_player.respawned.connect(_on_player_respawned)
 	_player.dashed.connect(_on_player_dashed)
-	_player.dash_recharged.connect(_on_dash_recharged)
-	_player.wall_jumped.connect(_on_player_wall_jumped)
-	_player.wall_slide_started.connect(_on_wall_slide_started)
+	
+	# Note: jumped, landed, wall_jumped, wall_slide_started, dash_recharged 
+	# ne sont plus disponibles dans la nouvelle version simplifiée du player
 
 	# Combat signals
 	_player.attack_started.connect(_on_attack_started)
-	_player.attack_hit.connect(_on_attack_hit)
 
 
-## === MOVEMENT EFFECTS ===
-func _on_player_jumped() -> void:
-	var pos := _player.global_position + Vector2(0, 8)
-	_particle_manager.spawn_particle(jump_particles, pos, Vector2.DOWN)
+## === MOVEMENT EFFECTS === (DÉSACTIVÉS - pas de saut/atterrissage dans cette version)
+# func _on_player_jumped() -> void:
+# 	var pos := _player.global_position + Vector2(0, 8)
+# 	_particle_manager.spawn_particle(jump_particles, pos, Vector2.DOWN)
 
 
-func _on_player_landed() -> void:
-	var pos := _player.global_position + Vector2(0, 8)
-
-	# Scale based on fall velocity (heavier landing = more particles)
-	var fall_velocity: float = abs(_player.velocity.y)
-	var scale_multiplier: float = clamp(fall_velocity / 500.0, 0.5, 2.0)
-
-	_particle_manager.spawn_particle(land_particles, pos, Vector2.DOWN, scale_multiplier)
-
-
-## === WALLS EFFECTS ===
-func _on_player_wall_jumped() -> void:
-	if wall_jump_particles:
-		var spawn_pos := _player.global_position
-		var direction := Vector2(_player.velocity.x, 0).normalized()
-		_particle_manager.spawn_particle(wall_jump_particles, spawn_pos, direction)
+# func _on_player_landed() -> void:
+# 	var pos := _player.global_position + Vector2(0, 8)
+# 
+# 	# Scale based on fall velocity (heavier landing = more particles)
+# 	var fall_velocity: float = abs(_player.velocity.y)
+# 	var scale_multiplier: float = clamp(fall_velocity / 500.0, 0.5, 2.0)
+# 
+# 	_particle_manager.spawn_particle(land_particles, pos, Vector2.DOWN, scale_multiplier)
 
 
-func _on_wall_slide_started() -> void:
-	_wall_slide_timer = 0.0
+## === WALLS EFFECTS === (DÉSACTIVÉ - fonctionnalités non disponibles dans cette version)
+# func _on_player_wall_jumped() -> void:
+# 	if wall_jump_particles:
+# 		var spawn_pos := _player.global_position
+# 		var direction := Vector2(_player.velocity.x, 0).normalized()
+# 		_particle_manager.spawn_particle(wall_jump_particles, spawn_pos, direction)
 
 
-## Update wall slide particles (continuous effect)
-func _update_wall_slide_particles(delta: float) -> void:
-	if not _player._is_wall_sliding or not wall_slide_particles:
-		return
+# func _on_wall_slide_started() -> void:
+# 	_wall_slide_timer = 0.0
 
-	_wall_slide_timer -= delta
 
-	if _wall_slide_timer <= 0:
-		_wall_slide_timer = wall_slide_particle_rate
-
-		# Spawn particles on the wall side
-		var wall_direction := Vector2(-sign(_player.velocity.x), 0)
-		var spawn_pos := _player.global_position + wall_direction * 8
-		_particle_manager.spawn_particle(wall_slide_particles, spawn_pos, wall_direction)
+## Update wall slide particles (continuous effect) - DÉSACTIVÉ
+# func _update_wall_slide_particles(delta: float) -> void:
+# 	if not _player._is_wall_sliding or not wall_slide_particles:
+# 		return
+# 
+# 	_wall_slide_timer -= delta
+# 
+# 	if _wall_slide_timer <= 0:
+# 		_wall_slide_timer = wall_slide_particle_rate
+# 
+# 		# Spawn particles on the wall side
+# 		var wall_direction := Vector2(-sign(_player.velocity.x), 0)
+# 		var spawn_pos := _player.global_position + wall_direction * 8
+# 		_particle_manager.spawn_particle(wall_slide_particles, spawn_pos, wall_direction)
 
 
 ## === STATUS EFFECTS ===
@@ -140,13 +137,13 @@ func _on_player_dashed() -> void:
 
 	# Spawn burst at dash start
 	if dash_burst_particles:
-		var direction := -_player._dash_direction # Opposite of dash direction
+		var direction: Vector2 = _player.get_facing_direction() * -1 # Opposite of dash direction
 		_particle_manager.spawn_particle(dash_burst_particles, _player.global_position, direction)
 
 
-func _on_dash_recharged() -> void:
-	# Could spawn subtle sparkle effect
-	pass
+# func _on_dash_recharged() -> void:
+# 	# Could spawn subtle sparkle effect - Signal non disponible dans cette version
+# 	pass
 
 
 ## Update dash trail (continuous effect during dash)
@@ -225,9 +222,9 @@ func _on_attack_started() -> void:
 	# Could spawn weapon trail particles
 	pass
 
-## Called when attack hits enemy
-func _on_attack_hit(target: Node2D) -> void:
-	if hit_impact_particles and is_instance_valid(target):
-		var hit_pos := target.global_position
-		var direction := (_player.global_position.direction_to(hit_pos))
-		_particle_manager.spawn_particle(hit_impact_particles, hit_pos, direction)
+## Called when attack hits enemy (DÉSACTIVÉ - signal non disponible)
+# func _on_attack_hit(target: Node2D) -> void:
+# 	if hit_impact_particles and is_instance_valid(target):
+# 		var hit_pos := target.global_position
+# 		var direction := (_player.global_position.direction_to(hit_pos))
+# 		_particle_manager.spawn_particle(hit_impact_particles, hit_pos, direction)
