@@ -32,5 +32,8 @@ enum ElementType {
 ## Rayon de la zone de collision
 @export var collision_radius: float = 20.0
 
+## L'attaque s'étend progressivement jusqu'à sa taille maximale
+@export var expand_over_time: bool = false
+
 ## Effet visuel (particules/sprites)
 @export var visual_effect: PackedScene = null

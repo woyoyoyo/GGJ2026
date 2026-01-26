@@ -3,7 +3,7 @@ extends Node2D
 var _time_elapsed: float = 0.0
 
 @onready var hud: HUD = $HUD
-@onready var player: PlayerController = $Level01/Player
+@onready var player: CharacterBody2D = $Level01/Player
 
 
 func _ready() -> void:

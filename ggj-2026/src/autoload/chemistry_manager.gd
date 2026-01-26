@@ -9,18 +9,38 @@ class ReactionRule:
 	var element_b: AttackData.ElementType
 	var result_attack_data: String  # Chemin vers le .tres
 	var reaction_name: String
-	var destroy_both: bool = true
+	var destroy_a: bool = true  # Détruire element_a
+	var destroy_b: bool = true  # Détruire element_b
+	var mark_a_reacted: bool = true  # Marquer element_a comme ayant réagi
+	var mark_b_reacted: bool = true  # Marquer element_b comme ayant réagi
 	
-	func _init(elem_a: AttackData.ElementType, elem_b: AttackData.ElementType, result: String, name: String, destroy: bool = true):
+	func _init(elem_a: AttackData.ElementType, elem_b: AttackData.ElementType, result: String, name: String, destroy_elem_a: bool = true, destroy_elem_b: bool = true, mark_elem_a_reacted: bool = true, mark_elem_b_reacted: bool = true):
 		element_a = elem_a
 		element_b = elem_b
 		result_attack_data = result
 		reaction_name = name
-		destroy_both = destroy
+		destroy_a = destroy_elem_a
+		destroy_b = destroy_elem_b
+		mark_a_reacted = mark_elem_a_reacted
+		mark_b_reacted = mark_elem_b_reacted
 	
 	func matches(type_a: AttackData.ElementType, type_b: AttackData.ElementType) -> bool:
 		return (type_a == element_a and type_b == element_b) or \
 			   (type_a == element_b and type_b == element_a)
+	
+	func should_destroy(attack_type: AttackData.ElementType) -> bool:
+		if attack_type == element_a:
+			return destroy_a
+		elif attack_type == element_b:
+			return destroy_b
+		return false
+	
+	func should_mark_reacted(attack_type: AttackData.ElementType) -> bool:
+		if attack_type == element_a:
+			return mark_a_reacted
+		elif attack_type == element_b:
+			return mark_b_reacted
+		return true
 
 ## Table des réactions (facile à étendre)
 var reaction_rules: Array[ReactionRule] = []
@@ -38,12 +58,16 @@ func _ready() -> void:
 
 ## Configure toutes les règles de réactions
 func _setup_reaction_rules() -> void:
-	# FIRE + GAS = EXPLOSION
+	# FIRE + GAS = EXPLOSION (détruit seulement le gaz, pas le feu)
 	reaction_rules.append(ReactionRule.new(
 		AttackData.ElementType.FIRE,
 		AttackData.ElementType.GAS,
 		"res://src/combat/data/explosion_attack.tres",
-		"FIRE_GAS_EXPLOSION"
+		"FIRE_GAS_EXPLOSION",
+		false,  # Ne pas détruire le feu
+		true,   # Détruire le gaz
+		false,  # Le feu peut réagir plusieurs fois
+		true    # Le gaz ne réagit qu'une fois
 	))
 	
 	# Ajouter d'autres réactions ici facilement:
@@ -86,9 +110,20 @@ func _apply_reaction(attack_a: Node2D, attack_b: Node2D, rule: ReactionRule) -> 
 	# Calculer la position de la réaction
 	var reaction_position = (attack_a.global_position + attack_b.global_position) / 2.0
 	
-	# Détruire les attaques si nécessaire (différé pour éviter les conflits de collision)
-	if rule.destroy_both:
+	# Obtenir les types d'éléments
+	var data_a: AttackData = attack_a.get_meta("attack_data")
+	var data_b: AttackData = attack_b.get_meta("attack_data")
+	
+	# Marquer comme ayant réagi si nécessaire (AVANT de détruire)
+	if rule.should_mark_reacted(data_a.element_type) and "has_reacted" in attack_a:
+		attack_a.has_reacted = true
+	if rule.should_mark_reacted(data_b.element_type) and "has_reacted" in attack_b:
+		attack_b.has_reacted = true
+	
+	# Détruire les attaques si nécessaire selon leur type
+	if rule.should_destroy(data_a.element_type):
 		attack_a.call_deferred("queue_free")
+	if rule.should_destroy(data_b.element_type):
 		attack_b.call_deferred("queue_free")
 	
 	# Créer l'attaque résultante (différé aussi)
@@ -108,7 +143,7 @@ func _spawn_result_attack(position: Vector2, rule: ReactionRule) -> void:
 	
 	# Créer l'instance
 	var result_attack = attack_instance_scene.instantiate()
-	get_tree().current_scene.add_child(result_attack)
+	get_tree().root.add_child(result_attack)
 	result_attack.initialize(result_data, position, Vector2.ZERO)
 
 ## Charge une AttackData avec cache
@@ -127,3 +162,14 @@ func get_element_name(element_type: AttackData.ElementType) -> String:
 		AttackData.ElementType.ELECTRIC: return "ELECTRIC"
 		AttackData.ElementType.WIND: return "WIND"
 		_: return "UNKNOWN"
+
+
+## Fonction publique pour spawn une attaque (utilisable par player, ennemis, etc.)
+func spawn_attack(attack_data: AttackData, position: Vector2, direction: Vector2) -> void:
+	if attack_data == null or attack_instance_scene == null:
+		push_warning("ChemistryManager: Cannot spawn attack - missing data or scene")
+		return
+	
+	var attack = attack_instance_scene.instantiate()
+	get_tree().root.call_deferred("add_child", attack)
+	attack.call_deferred("initialize", attack_data, position, direction)
