@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/attack_data.gd" id="1_gas_static"]
+
+[resource]
+script = ExtResource("1_gas_static")
+element_type = 2
+damage = 5.0
+range_distance = 0.0
+dissipation_time = 8.0
+cooldown = 0.0
+speed = 0.0
+visual_effect = null

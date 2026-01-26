@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/combat/attack_data.gd" id="1_fire"]
+
+[resource]
+script = ExtResource("1_fire")
+element_type = 1
+damage = 15.0
+range_distance = 60.0
+dissipation_time = 10.0
+cooldown = 1.5
+speed = 100.0
+visual_effect = null
