@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn2x4qw5cj2ev"]
+[gd_scene format=3 uid="uid://dn2x4qw5cj2ev"]
 
 [sub_resource type="Gradient" id="Gradient_e1h2m"]
 colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
@@ -21,7 +21,7 @@ scale_max = 6.0
 color = Color(0.9063318, 0.85430586, 0.7977378, 1)
 color_ramp = SubResource("GradientTexture1D_a1hal")
 
-[node name="LandParticles" type="GPUParticles2D"]
+[node name="LandParticles" type="GPUParticles2D" unique_id=1461144655]
 emitting = false
 amount = 20
 lifetime = 0.5

@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://c357twnhlsi0x"]
+[gd_scene format=3 uid="uid://c357twnhlsi0x"]
 
 [sub_resource type="Gradient" id="Gradient_oei4m"]
 colors = PackedColorArray(1, 1, 1, 1, 0.003921569, 0.003921569, 0.003921569, 0)
@@ -16,7 +16,7 @@ scale_min = 2.0
 scale_max = 4.0
 color_ramp = SubResource("GradientTexture1D_tu8e5")
 
-[node name="JumpParticles" type="GPUParticles2D"]
+[node name="JumpParticles" type="GPUParticles2D" unique_id=1763046527]
 emitting = false
 amount = 12
 lifetime = 0.4
