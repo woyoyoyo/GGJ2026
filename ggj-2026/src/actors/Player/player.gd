@@ -50,8 +50,12 @@ var _is_dashing: bool = false
 
 
 func _ready() -> void:
-	if animation_player and animation_player.has_animation("swim"):
-		animation_player.play("swim")
+	# Activer le tri en Y pour la profondeur (beat'em all style)
+	y_sort_enabled = true
+	
+	# Démarrer avec l'animation Idle
+	if animation_player and animation_player.has_animation("Idle"):
+		animation_player.play("Idle")
 
 
 func _physics_process(delta: float) -> void:
@@ -64,12 +68,44 @@ func _physics_process(delta: float) -> void:
 	# Appliquer le mouvement
 	_apply_movement(delta)
 	
-	# Rotation du sprite vers la direction
-	if _velocity.length() > 10:
-		sprite.rotation = _velocity.angle() + deg_to_rad(-90)
+	# Rotation du sprite selon direction horizontale uniquement (beat'em all style)
+	if _velocity.x != 0:
+		sprite.flip_h = _velocity.x < 0
 	
 	set_velocity(_velocity)
 	move_and_slide()
+	
+	# Mettre à jour le z_index basé sur la position Y pour le tri visuel
+	z_index = int(global_position.y)
+	
+	# Gestion des animations selon le mouvement
+	_update_animations()
+
+
+func _update_animations() -> void:
+	if animation_player == null:
+		print("AnimationPlayer n'existe pas!")
+		return
+	
+	# Ne pas changer l'animation pendant une attaque
+	if _is_attacking:
+		return
+	
+	# Vérifier si le personnage bouge
+	var is_moving = _velocity.length() > 10
+	
+	if is_moving:
+		if animation_player.has_animation("Move"):
+			if animation_player.current_animation != "Move":
+				animation_player.play("Move")
+		else:
+			print("Animation 'Move' introuvable. Animations disponibles: ", animation_player.get_animation_list())
+	else:
+		if animation_player.has_animation("Idle"):
+			if animation_player.current_animation != "Idle":
+				animation_player.play("Idle")
+		else:
+			print("Animation 'Idle' introuvable. Animations disponibles: ", animation_player.get_animation_list())
 
 
 func _update_timers(delta: float) -> void:
@@ -154,8 +190,9 @@ func set_speed_boost(enabled: bool) -> void:
 
 ## Obtient la direction du regard pour les attaques
 func get_facing_direction() -> Vector2:
-	# Direction basée sur la rotation du sprite
-	return Vector2(cos(sprite.rotation + deg_to_rad(90)), sin(sprite.rotation + deg_to_rad(90)))
+	# Direction basée sur le flip horizontal (beat'em all style)
+	# Si flip_h est vrai, regarde à gauche (-1), sinon à droite (1)
+	return Vector2(-1, 0) if sprite.flip_h else Vector2(1, 0)
 
 
 ## Respawns the player at a specific position
