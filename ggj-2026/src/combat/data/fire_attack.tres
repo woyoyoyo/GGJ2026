@@ -1,13 +1,11 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://dvrhvh41yfs5c"]
 
-[ext_resource type="Script" path="res://src/combat/attack_data.gd" id="1_fire"]
+[ext_resource type="Script" uid="uid://btv8nlrkbspwk" path="res://src/combat/attack_data.gd" id="1_fire"]
 
 [resource]
 script = ExtResource("1_fire")
 element_type = 1
 damage = 15.0
 range_distance = 60.0
-dissipation_time = 3.0
 cooldown = 1.5
 speed = 200.0
-visual_effect = null
