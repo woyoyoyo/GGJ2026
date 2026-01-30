@@ -117,6 +117,7 @@ libraries/ = SubResource("AnimationLibrary_7dnek")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1901156142]
 offset = Vector2(0, -150)
+zoom = Vector2(0.5, 0.5)
 position_smoothing_enabled = true
 
 [node name="PlayerSounds" type="Node" parent="." unique_id=1457896083]
