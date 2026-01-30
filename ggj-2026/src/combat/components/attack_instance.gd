@@ -16,14 +16,23 @@ var has_reacted: bool = false
 var initial_radius: float = 0.0
 var target_radius: float = 0.0
 
+## Owner de l'attaque (pour éviter l'auto-damage)
+var owner_node: Node2D = null
+
+## Bodies déjà touchés (pour éviter les multi-hits)
+var _damaged_bodies: Array[Node2D] = []
+
 func _ready() -> void:
 	# Connecter le signal de détection d'aire
 	area_entered.connect(_on_area_entered)
+	# Connecter le signal de détection de body (pour toucher les ennemis)
+	body_entered.connect(_on_body_entered)
 
-func initialize(data: AttackData, spawn_position: Vector2, move_direction: Vector2) -> void:
+func initialize(data: AttackData, spawn_position: Vector2, move_direction: Vector2, attack_owner: Node2D = null) -> void:
 	attack_data = data
 	global_position = spawn_position
 	direction = move_direction.normalized()
+	owner_node = attack_owner
 	
 	# Stocker l'attack_data en metadata pour le ChemistryManager
 	set_meta("attack_data", attack_data)
@@ -109,14 +118,30 @@ func _on_area_entered(area: Area2D) -> void:
 	# Ne pas réagir si cette attaque a déjà réagi
 	if has_reacted:
 		return
-	
+
 	# Vérifier si c'est une autre AttackInstance
 	if area.has_meta("attack_data"):
 		# Vérifier si c'est bien un attack_instance avec le flag has_reacted
 		var area_has_reacted = area.has_reacted if "has_reacted" in area else false
 		if area_has_reacted:
 			return
-		
+
 		# Appeler le ChemistryManager pour résoudre l'interaction
 		# Le ChemistryManager se chargera de marquer has_reacted selon les règles
 		ChemistryManager.resolve(self, area)
+
+
+func _on_body_entered(body: Node2D) -> void:
+	# Éviter de toucher le même body plusieurs fois
+	if body in _damaged_bodies:
+		return
+
+	# Éviter l'auto-damage
+	if body == owner_node:
+		return
+
+	# Toucher les ennemis
+	if body.is_in_group("enemies") and body.has_method("take_damage"):
+		_damaged_bodies.append(body)
+		var knockback_dir = (body.global_position - global_position).normalized()
+		body.take_damage(int(attack_data.damage), knockback_dir)
