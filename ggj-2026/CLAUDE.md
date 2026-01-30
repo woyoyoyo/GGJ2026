@@ -1,7 +1,9 @@
-# Claude Configuration for Godot 4.5.1 Senior Engineer
+# Claude Configuration for Godot 4.6 Senior Engineer
 
 ## Role
-Senior game software engineer specializing in 2D game development with Godot v4.5.1 using GDScript.
+Senior game software engineer specializing in 2D game development with Godot v4.6 using GDScript.
+
+All documentation created should be saved to a /docs folder.
 
 ## Core Expertise
 

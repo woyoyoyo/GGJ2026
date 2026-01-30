@@ -50,9 +50,12 @@ var _is_dashing: bool = false
 
 
 func _ready() -> void:
+	# Ajouter au groupe player pour la détection par les ennemis
+	add_to_group("player")
+
 	# Activer le tri en Y pour la profondeur (beat'em all style)
 	y_sort_enabled = true
-	
+
 	# Démarrer avec l'animation Idle
 	if animation_player and animation_player.has_animation("Idle"):
 		animation_player.play("Idle")
@@ -218,6 +221,9 @@ func die() -> void:
 func _spawn_attack(attack_data: AttackData) -> void:
 	# Position de spawn devant le joueur
 	var spawn_position = global_position + get_facing_direction() * attack_offset
-	
+
 	# Utiliser le ChemistryManager pour spawn (disponible pour tous les acteurs)
-	ChemistryManager.spawn_attack(attack_data, spawn_position, get_facing_direction())
+	ChemistryManager.spawn_attack(attack_data, spawn_position, get_facing_direction(), self)
+
+	# Démarrer l'état d'attaque
+	_start_attack()
