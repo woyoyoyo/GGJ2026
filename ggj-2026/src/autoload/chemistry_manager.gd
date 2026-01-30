@@ -165,11 +165,11 @@ func get_element_name(element_type: AttackData.ElementType) -> String:
 
 
 ## Fonction publique pour spawn une attaque (utilisable par player, ennemis, etc.)
-func spawn_attack(attack_data: AttackData, position: Vector2, direction: Vector2) -> void:
+func spawn_attack(attack_data: AttackData, position: Vector2, direction: Vector2, attack_owner: Node2D = null) -> void:
 	if attack_data == null or attack_instance_scene == null:
 		push_warning("ChemistryManager: Cannot spawn attack - missing data or scene")
 		return
-	
+
 	var attack = attack_instance_scene.instantiate()
 	get_tree().root.call_deferred("add_child", attack)
-	attack.call_deferred("initialize", attack_data, position, direction)
+	attack.call_deferred("initialize", attack_data, position, direction, attack_owner)
