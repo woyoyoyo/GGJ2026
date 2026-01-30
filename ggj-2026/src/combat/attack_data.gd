@@ -6,8 +6,7 @@ enum ElementType {
 	NONE,
 	FIRE,
 	GAS,
-	WATER,
-	ELECTRIC,
+	WATER,	ICE,	ELECTRIC,
 	WIND
 }
 
@@ -29,11 +28,23 @@ enum ElementType {
 ## Vitesse de déplacement (0 = statique, >0 = projectile)
 @export var speed: float = 0.0
 
+## Inverser la direction de l'attaque (va vers l'arrière au lieu de l'avant)
+@export var reverse_direction: bool = false
+
 ## Rayon de la zone de collision
 @export var collision_radius: float = 20.0
 
 ## L'attaque s'étend progressivement jusqu'à sa taille maximale
 @export var expand_over_time: bool = false
+
+## Ignorer l'axe Y (touche sur toute la hauteur, pour beat'em up)
+@export var ignore_y_axis: bool = false
+
+## Attaque à spawner en trainée (pour les projectiles qui laissent une trace)
+@export var trail_attack_data: AttackData = null
+
+## Distance entre chaque spawn de trainée (en pixels)
+@export var trail_spawn_distance: float = 30.0
 
 ## Effet visuel (particules/sprites)
 @export var visual_effect: PackedScene = null

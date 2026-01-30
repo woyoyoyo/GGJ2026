@@ -7,17 +7,24 @@ signal reaction_occurred(reaction_type: String, position: Vector2)
 class ReactionRule:
 	var element_a: AttackData.ElementType
 	var element_b: AttackData.ElementType
-	var result_attack_data: String  # Chemin vers le .tres
+	var result_attack_data: Array[String] = []  # Chemins vers les .tres (peut être vide ou multiple)
 	var reaction_name: String
 	var destroy_a: bool = true  # Détruire element_a
 	var destroy_b: bool = true  # Détruire element_b
 	var mark_a_reacted: bool = true  # Marquer element_a comme ayant réagi
 	var mark_b_reacted: bool = true  # Marquer element_b comme ayant réagi
 	
-	func _init(elem_a: AttackData.ElementType, elem_b: AttackData.ElementType, result: String, name: String, destroy_elem_a: bool = true, destroy_elem_b: bool = true, mark_elem_a_reacted: bool = true, mark_elem_b_reacted: bool = true):
+	func _init(elem_a: AttackData.ElementType, elem_b: AttackData.ElementType, result: Variant, name: String, destroy_elem_a: bool = true, destroy_elem_b: bool = true, mark_elem_a_reacted: bool = true, mark_elem_b_reacted: bool = true):
 		element_a = elem_a
 		element_b = elem_b
-		result_attack_data = result
+		# Accepter soit une String, soit un Array
+		if result is String:
+			if result != "":
+				result_attack_data.append(result)
+		elif result is Array:
+			for item in result:
+				if item is String:
+					result_attack_data.append(item)
 		reaction_name = name
 		destroy_a = destroy_elem_a
 		destroy_b = destroy_elem_b
@@ -58,6 +65,102 @@ func _ready() -> void:
 
 ## Configure toutes les règles de réactions
 func _setup_reaction_rules() -> void:
+	# FIRE + WATER = S'annulent (pas de résultat)
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FIRE,
+		AttackData.ElementType.WATER,
+		"",  # Pas de résultat
+		"FIRE_WATER_CANCEL",
+		true,  # Détruire le feu
+		true,  # Détruire l'eau
+		true,  # Le feu ne réagit qu'une fois
+		true   # L'eau ne réagit qu'une fois
+	))
+	
+	# GAS + WATER = 2 zones d'eau séparées
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.GAS,
+		AttackData.ElementType.WATER,
+		["res://src/combat/data/water_static.tres", "res://src/combat/data/water_static.tres"],  # 2 zones d'eau
+		"GAS_WATER_SPLIT",
+		true,  # Détruire le gaz
+		true,  # Détruire l'eau
+		true,  # Le gaz ne réagit qu'une fois
+		true   # L'eau ne réagit qu'une fois
+	))
+	
+	# GAS + ICE = Bloc de gaz gelé (durée indéfinie)
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.GAS,
+		AttackData.ElementType.ICE,
+		"res://src/combat/data/gas_block.tres",
+		"GAS_ICE_BLOCK",
+		true,  # Détruire le gaz
+		true,  # Détruire la glace
+		true,  # Le gaz ne réagit qu'une fois
+		true   # La glace ne réagit qu'une fois
+	))
+	
+	# WATER + ICE = Glace (l'eau gèle)
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.WATER,
+		AttackData.ElementType.ICE,
+		"res://src/combat/data/ice_static.tres",
+		"WATER_ICE_FREEZE",
+		true,  # Détruire l'eau
+		true,  # Détruire la glace
+		true,  # L'eau ne réagit qu'une fois
+		true   # La glace ne réagit qu'une fois
+	))
+	
+	# GAS + ELECTRIC = Explosion de feu
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.GAS,
+		AttackData.ElementType.ELECTRIC,
+		"res://src/combat/data/fire_explosion.tres",
+		"GAS_ELECTRIC_FIRE_EXPLOSION",
+		true,  # Détruire le gaz
+		true,  # Détruire l'électricité
+		true,  # Le gaz ne réagit qu'une fois
+		true   # L'électricité ne réagit qu'une fois
+	))
+	
+	# FIRE + ELECTRIC = PLASMA (état le plus chaud de la matière)
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FIRE,
+		AttackData.ElementType.ELECTRIC,
+		"res://src/combat/data/plasma_attack.tres",
+		"FIRE_ELECTRIC_PLASMA",
+		true,  # Détruire le feu
+		true,  # Détruire l'électricité
+		true,  # Le feu ne réagit qu'une fois
+		true   # L'électricité ne réagit qu'une fois
+	))
+	
+	# WATER + ELECTRIC = Electric static (eau électrifiée)
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.WATER,
+		AttackData.ElementType.ELECTRIC,
+		"res://src/combat/data/lightning_static.tres",
+		"WATER_ELECTRIC_STATIC",
+		true,  # Détruire l'eau
+		true,  # Détruire l'électricité
+		true,  # L'eau ne réagit qu'une fois
+		true   # L'électricité ne réagit qu'une fois
+	))
+	
+	# ICE + ELECTRIC = Explosion de projectiles de glace
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.ICE,
+		AttackData.ElementType.ELECTRIC,
+		["res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres"],
+		"ICE_ELECTRIC_ICE_EXPLOSION",
+		true,  # Détruire la glace
+		true,  # Détruire l'électricité
+		true,  # La glace ne réagit qu'une fois
+		true   # L'électricité ne réagit qu'une fois
+	))
+	
 	# FIRE + GAS = EXPLOSION (détruit seulement le gaz, pas le feu)
 	reaction_rules.append(ReactionRule.new(
 		AttackData.ElementType.FIRE,
@@ -135,16 +238,32 @@ func _apply_reaction(attack_a: Node2D, attack_b: Node2D, rule: ReactionRule) -> 
 
 ## Spawn l'attaque résultante d'une réaction
 func _spawn_result_attack(position: Vector2, rule: ReactionRule) -> void:
-	# Charger l'AttackData (avec cache)
-	var result_data = _load_attack_data(rule.result_attack_data)
-	
-	if result_data == null or attack_instance_scene == null:
+	# Si pas de résultat (annulation), ne rien spawner
+	if rule.result_attack_data.is_empty():
 		return
 	
-	# Créer l'instance
-	var result_attack = attack_instance_scene.instantiate()
-	get_tree().root.add_child(result_attack)
-	result_attack.initialize(result_data, position, Vector2.ZERO)
+	# Spawner chaque attaque résultante
+	for i in range(rule.result_attack_data.size()):
+		var attack_path = rule.result_attack_data[i]
+		
+		# Charger l'AttackData (avec cache)
+		var result_data = _load_attack_data(attack_path)
+		
+		if result_data == null or attack_instance_scene == null:
+			continue
+		
+		# Calculer un offset pour séparer les résultats multiples
+		var offset = Vector2.ZERO
+		if rule.result_attack_data.size() > 1:
+			# Séparer horizontalement
+			var spacing = 40.0
+			var total_width = (rule.result_attack_data.size() - 1) * spacing
+			offset = Vector2((i * spacing) - (total_width / 2.0), 0)
+		
+		# Créer l'instance
+		var result_attack = attack_instance_scene.instantiate()
+		get_tree().root.add_child(result_attack)
+		result_attack.initialize(result_data, position + offset, Vector2.ZERO)
 
 ## Charge une AttackData avec cache
 func _load_attack_data(path: String) -> AttackData:

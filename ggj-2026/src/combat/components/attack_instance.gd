@@ -22,6 +22,10 @@ var owner_node: Node2D = null
 ## Bodies déjà touchés (pour éviter les multi-hits)
 var _damaged_bodies: Array[Node2D] = []
 
+## Trail system
+var _last_trail_position: Vector2 = Vector2.ZERO
+var _trail_distance_traveled: float = 0.0
+
 func _ready() -> void:
 	# Connecter le signal de détection d'aire
 	area_entered.connect(_on_area_entered)
@@ -33,6 +37,9 @@ func initialize(data: AttackData, spawn_position: Vector2, move_direction: Vecto
 	global_position = spawn_position
 	direction = move_direction.normalized()
 	owner_node = attack_owner
+	
+	# Initialiser la position de départ de la trainée
+	_last_trail_position = spawn_position
 	
 	# Stocker l'attack_data en metadata pour le ChemistryManager
 	set_meta("attack_data", attack_data)
@@ -49,8 +56,14 @@ func initialize(data: AttackData, spawn_position: Vector2, move_direction: Vecto
 	# Ajuster la taille de la collision si définie
 	if attack_data.collision_radius > 0:
 		var collision_shape = $CollisionShape2D
-		if collision_shape and collision_shape.shape is CircleShape2D:
-			collision_shape.shape.radius = attack_data.collision_radius
+		if collision_shape:
+			if attack_data.ignore_y_axis:
+				# Créer une forme rectangulaire très haute pour toucher sur tout l'axe Y
+				var rect_shape = RectangleShape2D.new()
+				rect_shape.size = Vector2(attack_data.collision_radius * 2, 2000.0)  # Très haut
+				collision_shape.shape = rect_shape
+			elif collision_shape.shape is CircleShape2D:
+				collision_shape.shape.radius = attack_data.collision_radius
 	
 	# Configurer l'apparence visuelle si définie
 	if attack_data.visual_effect != null:
@@ -88,6 +101,8 @@ func _get_element_color() -> Color:
 			return Color(0.5, 1.0, 0.5, 0.5)  # Vert semi-transparent
 		AttackData.ElementType.WATER:
 			return Color(0.2, 0.5, 1.0, 0.6)  # Bleu
+		AttackData.ElementType.ICE:
+			return Color(0.6, 0.9, 1.0, 0.8)  # Bleu clair glacé
 		AttackData.ElementType.ELECTRIC:
 			return Color(1.0, 1.0, 0.0, 0.8)  # Jaune
 		AttackData.ElementType.WIND:
@@ -101,7 +116,17 @@ func _process(delta: float) -> void:
 	
 	# Déplacement si speed > 0
 	if attack_data.speed > 0:
+		var old_position = global_position
 		global_position += direction * attack_data.speed * delta
+		
+		# Spawn trail si configuré
+		if attack_data.trail_attack_data != null:
+			var distance_moved = old_position.distance_to(global_position)
+			_trail_distance_traveled += distance_moved
+			
+			if _trail_distance_traveled >= attack_data.trail_spawn_distance:
+				_spawn_trail_attack()
+				_trail_distance_traveled = 0.0
 	
 	# Expansion progressive
 	if attack_data.expand_over_time:
@@ -113,6 +138,15 @@ func _process(delta: float) -> void:
 	lifetime += delta
 	if lifetime >= attack_data.dissipation_time:
 		queue_free()
+
+
+func _spawn_trail_attack() -> void:
+	if attack_data.trail_attack_data == null:
+		return
+	
+	# Utiliser le ChemistryManager pour spawn la trainée
+	ChemistryManager.spawn_attack(attack_data.trail_attack_data, global_position, Vector2.ZERO, owner_node)
+
 
 func _on_area_entered(area: Area2D) -> void:
 	# Ne pas réagir si cette attaque a déjà réagi
@@ -132,6 +166,11 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
+	# Détruire l'attaque si elle touche un mur (TileMap ou StaticBody2D)
+	if body is TileMap or body is StaticBody2D:
+		queue_free()
+		return
+	
 	# Éviter de toucher le même body plusieurs fois
 	if body in _damaged_bodies:
 		return

@@ -11,6 +11,15 @@ signal took_damage(damage: int, health_remaining: int)
 signal dashed
 signal attack_started
 signal attack_ended
+signal mask_changed(new_mask: int)
+
+# Mask types
+# FIRE = Boule de feu (cd long)
+# GAS = Boule de gaz (cd court)
+# WATER = Trainée en avant
+# ICE = Boule de glace gèle au contact
+# LIGHTNING = Zone autour de toi
+enum MaskType { FIRE, GAS, WATER, ICE, LIGHTNING }
 
 # === MOVEMENT CONSTANTS ===
 @export var speed: float = 200.0
@@ -28,12 +37,22 @@ signal attack_ended
 
 # Attack Data pour tests
 var fire_attack_data: AttackData = preload("res://src/combat/data/fire_attack.tres")
-var gas_static_data: AttackData = preload("res://src/combat/data/gas_static.tres")
+var gas_static_data: AttackData = preload("res://src/combat/data/gas_attack.tres")
+var water_attack_data: AttackData = preload("res://src/combat/data/water_attack.tres")  # Trainée en avant
+var ice_attack_data: AttackData = preload("res://src/combat/data/ice_attack.tres")  # Gèle au contact
+var lightning_attack_data: AttackData = preload("res://src/combat/data/lightning_attack.tres")  # Zone autour
+
+# Mask system
+var available_masks: Array[MaskType] = [MaskType.FIRE, MaskType.GAS, MaskType.WATER, MaskType.ICE, MaskType.LIGHTNING]
+var current_mask_index: int = 0
 
 # === STATE VARIABLES ===
 var direction: Vector2 = Vector2.ZERO
 var _velocity: Vector2 = Vector2.ZERO
 var _is_boosted: bool = false  # Pour un boost de vitesse (dash/skill)
+
+# Dernière direction de mouvement pour les attaques
+var _last_move_direction: Vector2 = Vector2.DOWN
 
 # Timers
 var _dash_timer: float = 0.0
@@ -64,7 +83,11 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
 	
-	# Ne pas traiter les inputs si en train d'attaquer ou de dasher
+	# Permettre de changer de masque à tout moment
+	if Input.is_action_just_pressed("switch_mask"):
+		_switch_mask()
+	
+	# Ne pas traiter les autres inputs si en train d'attaquer ou de dasher
 	if not _is_attacking and not _is_dashing:
 		_handle_input()
 	
@@ -135,16 +158,17 @@ func _handle_input() -> void:
 		Input.get_action_strength("move_down") - Input.get_action_strength("move_up")
 	).normalized()
 	
+	# Mettre à jour la dernière direction si le joueur bouge
+	if direction.length() > 0.1:
+		_last_move_direction = direction
+	
 	# Dash
 	if Input.is_action_just_pressed("dash") and _dash_cooldown_timer <= 0:
 		_perform_dash()
 	
-	# Test attacks
-	if Input.is_action_just_pressed("ui_accept"):  # Espace - Gaz statique
-		_spawn_attack(gas_static_data)
-	
-	if Input.is_action_just_pressed("attack"):  # Attack - Boule de feu
-		_spawn_attack(fire_attack_data)
+	# Attack avec Espace (jump)
+	if Input.is_action_just_pressed("jump"):
+		_spawn_attack(_get_current_attack_data())
 
 
 func _apply_movement(_delta: float) -> void:
@@ -193,9 +217,8 @@ func set_speed_boost(enabled: bool) -> void:
 
 ## Obtient la direction du regard pour les attaques
 func get_facing_direction() -> Vector2:
-	# Direction basée sur le flip horizontal (beat'em all style)
-	# Si flip_h est vrai, regarde à gauche (-1), sinon à droite (1)
-	return Vector2(-1, 0) if sprite.flip_h else Vector2(1, 0)
+	# Utiliser la dernière direction de mouvement
+	return _last_move_direction.normalized()
 
 
 ## Respawns the player at a specific position
@@ -217,13 +240,72 @@ func die() -> void:
 	died.emit()
 
 
+## Switch entre les masques disponibles
+func _switch_mask() -> void:
+	if available_masks.is_empty():
+		return
+	
+	# Cycle vers le masque suivant
+	current_mask_index = (current_mask_index + 1) % available_masks.size()
+	var new_mask = available_masks[current_mask_index]
+	
+	mask_changed.emit(new_mask)
+	print("Masque changé: ", _get_mask_name(new_mask))
+
+
+## Retourne l'AttackData correspondant au masque équipé
+func _get_current_attack_data() -> AttackData:
+	if available_masks.is_empty():
+		return fire_attack_data
+	
+	var current_mask = available_masks[current_mask_index]
+	print("Index actuel: ", current_mask_index, " | Masque: ", _get_mask_name(current_mask))
+	
+	match current_mask:
+		MaskType.FIRE:
+			return fire_attack_data
+		MaskType.GAS:
+			return gas_static_data
+		MaskType.WATER:
+			return water_attack_data
+		MaskType.ICE:
+			return ice_attack_data
+		MaskType.LIGHTNING:
+			return lightning_attack_data
+		_:
+			return fire_attack_data  # Fallback
+
+
+## Retourne le nom du masque pour le debug
+func _get_mask_name(mask: MaskType) -> String:
+	match mask:
+		MaskType.FIRE:
+			return "FIRE"
+		MaskType.GAS:
+			return "GAS"
+		MaskType.WATER:
+			return "WATER"
+		MaskType.ICE:
+			return "ICE"
+		MaskType.LIGHTNING:
+			return "LIGHTNING"
+		_:
+			return "UNKNOWN"
+
+
 ## Spawn une attaque à partir d'AttackData
 func _spawn_attack(attack_data: AttackData) -> void:
-	# Position de spawn devant le joueur
-	var spawn_position = global_position + get_facing_direction() * attack_offset
+	var attack_direction = get_facing_direction()
+	
+	# Inverser la direction si spécifié dans les data
+	if attack_data.reverse_direction:
+		attack_direction = -attack_direction
+	
+	# Position de spawn dans la direction de l'attaque
+	var spawn_position = global_position + attack_direction * attack_offset
 
 	# Utiliser le ChemistryManager pour spawn (disponible pour tous les acteurs)
-	ChemistryManager.spawn_attack(attack_data, spawn_position, get_facing_direction(), self)
+	ChemistryManager.spawn_attack(attack_data, spawn_position, attack_direction, self)
 
 	# Démarrer l'état d'attaque
 	_start_attack()

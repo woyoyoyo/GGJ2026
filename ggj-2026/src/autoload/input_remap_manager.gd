@@ -14,7 +14,7 @@ func _ready() -> void:
 
 
 func save_default_inputs() -> void:
-	var actions = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "defense", "validate", "cancel", "pause"]
+	var actions = ["move_left", "move_right", "move_up", "move_down", "action", "attack", "switch_mask", "defense", "validate", "cancel", "pause"]
 	for action_name in actions:
 		if InputMap.has_action(action_name):
 			default_inputs[action_name] = InputMap.action_get_events(action_name).duplicate()
@@ -29,6 +29,7 @@ func get_action_display_name(action: String) -> String:
 		"jump": "ACTION_JUMP",
 		"action": "ACTION_ACTION",
 		"attack": "ACTION_ATTACK",
+		"switch_mask": "ACTION_SWITCH_MASK",
 		"defense": "ACTION_DEFENSE",
 		"validate": "ACTION_VALIDATE",
 		"cancel": "ACTION_CANCEL",
@@ -95,7 +96,7 @@ func remap_action(action: String, new_event: InputEvent) -> void:
 
 func save_custom_inputs() -> void:
 	var custom_inputs = {}
-	var actions = ["move_left", "move_right", "move_up", "move_down", "jump", "action", "attack", "pause"]
+	var actions = ["move_left", "move_right", "move_up", "move_down", "action", "attack", "switch_mask", "pause"]
 	
 	for action_name in actions:
 		if not InputMap.has_action(action_name):
