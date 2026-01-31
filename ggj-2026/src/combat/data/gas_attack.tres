@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://diuotcjdaf0vl"]
+[gd_resource type="Resource" script_class="AttackData" format=3 uid="uid://diuotcjdaf0vl"]
 
 [ext_resource type="Script" uid="uid://btv8nlrkbspwk" path="res://src/combat/attack_data.gd" id="1_gas"]
 [ext_resource type="Resource" uid="uid://b0catnltvlj0m" path="res://src/combat/data/gas_static.tres" id="2_gas_static"]
