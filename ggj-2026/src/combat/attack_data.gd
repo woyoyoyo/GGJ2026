@@ -7,7 +7,8 @@ enum ElementType {
 	FIRE,
 	GAS,
 	WATER,	ICE,	ELECTRIC,
-	WIND
+	WIND,
+	FROZEN_GAS
 }
 
 ## Type d'élément de l'attaque

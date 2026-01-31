@@ -7,7 +7,7 @@
 script = ExtResource("1_water")
 element_type = 3
 damage = 8.0
-range_distance = 100.0
+range_distance = 60.0
 dissipation_time = 5.0
 cooldown = 1.5
 speed = 400.0
