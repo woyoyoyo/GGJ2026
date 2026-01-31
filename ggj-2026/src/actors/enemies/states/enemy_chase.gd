@@ -1,8 +1,6 @@
 extends State
 class_name EnemyChaseState
 
-@export var stop_distance: float = 100.0  # Stop moving when this close
-
 var _enemy: EnemyBase
 
 func enter() -> void:
@@ -15,21 +13,22 @@ func physics_update(_delta: float) -> void:
 	
 	var distance = _enemy.global_position.distance_to(_enemy.target.global_position)
 	
-	print("Distance: ", distance, " | stop_distance: ", stop_distance, " | attack_range: ", _enemy.attack_range)
-	
 	# Lost the player - return to Idle
 	if distance > _enemy.detection_range:
 		transition_requested.emit(self, "Idle")
 		return
 	
-	# In attack range and can attack - do it
-	if distance <= _enemy.attack_range and _enemy.can_attack():
-		transition_requested.emit(self, "Attack")
-		return
+	# Check if player is in attack range
+	var player_in_range = _enemy.attack_hitbox.is_player_in_range()
 	
-	# Movement: chase if too far, stop if close enough
-	if distance > stop_distance:
+	if player_in_range:
+		# Stop moving when in range
+		_enemy.velocity = Vector2.ZERO
+		
+		# Attack if cooldown is ready
+		if _enemy.can_attack():
+			transition_requested.emit(self, "Attack")
+	else:
+		# Chase the player
 		var direction = (_enemy.target.global_position - _enemy.global_position).normalized()
 		_enemy.velocity = direction * _enemy.speed
-	else:
-		_enemy.velocity = Vector2.ZERO
