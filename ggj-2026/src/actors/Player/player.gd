@@ -22,7 +22,7 @@ signal mask_changed(new_mask: int)
 enum MaskType { FIRE, GAS, WATER, ICE, LIGHTNING }
 
 # === MOVEMENT CONSTANTS ===
-@export var speed: float = 200.0
+@export var speed: float = 400.0
 @export var speed_boost: float = 1.5  # Multiplicateur de vitesse
 @export var inertia: float = 0.15  # 0.0 = lourd, 1.0 = aérien
 

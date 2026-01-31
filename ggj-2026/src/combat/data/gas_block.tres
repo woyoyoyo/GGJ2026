@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1_gas_block")
-element_type = 2
-damage = 5.0
+element_type = 7
+damage = 0.0
 range_distance = 80.0
-dissipation_time = 999999.0
+dissipation_time = 45.0
 cooldown = 0.0
 speed = 0.0
 collision_radius = 30.0

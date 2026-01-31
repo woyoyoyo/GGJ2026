@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_ice_static")
 element_type = 4
-damage = 0.0
+damage = 2.0
 range_distance = 80.0
 dissipation_time = 12.0
 cooldown = 0.0
 speed = 0.0
-collision_radius = 20.0
+collision_radius = 30.0

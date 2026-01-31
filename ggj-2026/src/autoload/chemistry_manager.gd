@@ -77,17 +77,17 @@ func _setup_reaction_rules() -> void:
 		true   # L'eau ne réagit qu'une fois
 	))
 	
-	# GAS + WATER = 2 zones d'eau séparées
-	reaction_rules.append(ReactionRule.new(
-		AttackData.ElementType.GAS,
-		AttackData.ElementType.WATER,
-		["res://src/combat/data/water_static.tres", "res://src/combat/data/water_static.tres"],  # 2 zones d'eau
-		"GAS_WATER_SPLIT",
-		true,  # Détruire le gaz
-		true,  # Détruire l'eau
-		true,  # Le gaz ne réagit qu'une fois
-		true   # L'eau ne réagit qu'une fois
-	))
+	# GAS + WATER = l'eau se separe en 2
+	# reaction_rules.append(ReactionRule.new(
+	#  	AttackData.ElementType.GAS,
+	#  	AttackData.ElementType.WATER,
+	#  	["res://src/combat/data/water_attack.tres", "res://src/combat/data/water_attack.tres"],  # 2 projectiles d'eau
+	#  	"GAS_WATER_SPLIT",
+	# 	false,  # Détruire le gaz
+	#  	true,  # Détruire l'eau
+	#  	true,  # Le gaz ne réagit qu'une fois
+	#  	true   # L'eau ne réagit qu'une fois
+	# ))
 	
 	# GAS + ICE = Bloc de gaz gelé (durée indéfinie)
 	reaction_rules.append(ReactionRule.new(
@@ -95,10 +95,10 @@ func _setup_reaction_rules() -> void:
 		AttackData.ElementType.ICE,
 		"res://src/combat/data/gas_block.tres",
 		"GAS_ICE_BLOCK",
-		true,  # Détruire le gaz
-		true,  # Détruire la glace
-		true,  # Le gaz ne réagit qu'une fois
-		true   # La glace ne réagit qu'une fois
+		false,  # Détruire le gaz
+		false,  # Détruire la glace
+		false,  # Le gaz ne réagit qu'une fois
+		false   # La glace ne réagit qu'une fois
 	))
 	
 	# WATER + ICE = Glace (l'eau gèle)
@@ -108,9 +108,9 @@ func _setup_reaction_rules() -> void:
 		"res://src/combat/data/ice_static.tres",
 		"WATER_ICE_FREEZE",
 		true,  # Détruire l'eau
-		true,  # Détruire la glace
+		false,  # Détruire la glace
 		true,  # L'eau ne réagit qu'une fois
-		true   # La glace ne réagit qu'une fois
+		false   # La glace ne réagit qu'une fois
 	))
 	
 	# GAS + ELECTRIC = Explosion de feu
@@ -149,11 +149,11 @@ func _setup_reaction_rules() -> void:
 		true   # L'électricité ne réagit qu'une fois
 	))
 	
-	# ICE + ELECTRIC = Explosion de projectiles de glace
+	# ICE + ELECTRIC = Explosion de glace
 	reaction_rules.append(ReactionRule.new(
 		AttackData.ElementType.ICE,
 		AttackData.ElementType.ELECTRIC,
-		["res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres", "res://src/combat/data/ice_static.tres"],
+		"res://src/combat/data/ice_explosion.tres",
 		"ICE_ELECTRIC_ICE_EXPLOSION",
 		true,  # Détruire la glace
 		true,  # Détruire l'électricité
@@ -173,14 +173,66 @@ func _setup_reaction_rules() -> void:
 		true    # Le gaz ne réagit qu'une fois
 	))
 	
+	# FROZEN_GAS + WATER = Glace
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FROZEN_GAS,
+		AttackData.ElementType.WATER,
+		"res://src/combat/data/ice_static.tres",
+		"FROZEN_GAS_WATER_FREEZE",
+		true,  # Détruire le gaz gelé
+		true,  # Détruire l'eau
+		true,  # Le gaz gelé ne réagit qu'une fois
+		true   # L'eau ne réagit qu'une fois
+	))
+	
+	# FROZEN_GAS + FIRE = Méga explosion ultra violente
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FROZEN_GAS,
+		AttackData.ElementType.FIRE,
+		"res://src/combat/data/mega_explosion.tres",
+		"FROZEN_GAS_FIRE_EXPLOSION",
+		true,  # Détruire le gaz gelé
+		true,  # Détruire le feu
+		true,  # Le gaz gelé ne réagit qu'une fois
+		true   # Le feu ne réagit qu'une fois
+	))
+	
+	# FROZEN_GAS + ELECTRIC = Méga explosion ultra violente
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FROZEN_GAS,
+		AttackData.ElementType.ELECTRIC,
+		"res://src/combat/data/mega_explosion.tres",
+		"FROZEN_GAS_ELECTRIC_EXPLOSION",
+		true,  # Détruire le gaz gelé
+		true,  # Détruire l'électricité
+		true,  # Le gaz gelé ne réagit qu'une fois
+		true   # L'électricité ne réagit qu'une fois
+	))
+	
+	# FROZEN_GAS + GAS = Gas block
+	reaction_rules.append(ReactionRule.new(
+		AttackData.ElementType.FROZEN_GAS,
+		AttackData.ElementType.GAS,
+		"res://src/combat/data/gas_block.tres",
+		"FROZEN_GAS_GAS_BLOCK",
+		true,  # Détruire le gaz gelé
+		true,  # Détruire le gaz
+		true,  # Le gaz gelé ne réagit qu'une fois
+		true   # Le gaz ne réagit qu'une fois
+	))
+	
 	# Ajouter d'autres réactions ici facilement:
 	# WATER + ELECTRIC = ELECTRIFIED_WATER
-	# reaction_rules.append(ReactionRule.new(
-	#     AttackData.ElementType.WATER,
-	#     AttackData.ElementType.ELECTRIC,
-	#     "res://src/scripts/electrified_water.tres",
-	#     "WATER_ELECTRIC_SHOCK"
-	# ))
+	reaction_rules.append(ReactionRule.new(
+		 AttackData.ElementType.WATER,
+		 AttackData.ElementType.ELECTRIC,
+		 "res://src/scripts/electrified_water.tres",
+		 "WATER_ELECTRIC_SHOCK",
+		 true,  # l'eau est detruite
+		 true,   # l'etricticité est detruite
+		 true,  # l'eau ne réagit qu'une fois
+		 false    # L'électricité peut réagir plusieurs fois
+	 ))
 	
 	# WIND + FIRE = FIRESTORM
 	# reaction_rules.append(ReactionRule.new(
@@ -217,6 +269,13 @@ func _apply_reaction(attack_a: Node2D, attack_b: Node2D, rule: ReactionRule) -> 
 	var data_a: AttackData = attack_a.get_meta("attack_data")
 	var data_b: AttackData = attack_b.get_meta("attack_data")
 	
+	# Récupérer la direction de l'eau (l'attaque qui bouge)
+	var water_direction = Vector2.ZERO
+	if data_a.element_type == AttackData.ElementType.WATER and "direction" in attack_a:
+		water_direction = attack_a.direction
+	elif data_b.element_type == AttackData.ElementType.WATER and "direction" in attack_b:
+		water_direction = attack_b.direction
+	
 	# Marquer comme ayant réagi si nécessaire (AVANT de détruire)
 	if rule.should_mark_reacted(data_a.element_type) and "has_reacted" in attack_a:
 		attack_a.has_reacted = true
@@ -230,14 +289,14 @@ func _apply_reaction(attack_a: Node2D, attack_b: Node2D, rule: ReactionRule) -> 
 		attack_b.call_deferred("queue_free")
 	
 	# Créer l'attaque résultante (différé aussi)
-	call_deferred("_spawn_result_attack", reaction_position, rule)
+	call_deferred("_spawn_result_attack", reaction_position, rule, water_direction)
 	
 	# Émettre le signal
 	reaction_occurred.emit(rule.reaction_name, reaction_position)
 	print("💥 Réaction: ", rule.reaction_name, " à ", reaction_position)
 
 ## Spawn l'attaque résultante d'une réaction
-func _spawn_result_attack(position: Vector2, rule: ReactionRule) -> void:
+func _spawn_result_attack(position: Vector2, rule: ReactionRule, incoming_direction: Vector2 = Vector2.ZERO) -> void:
 	# Si pas de résultat (annulation), ne rien spawner
 	if rule.result_attack_data.is_empty():
 		return
@@ -252,18 +311,30 @@ func _spawn_result_attack(position: Vector2, rule: ReactionRule) -> void:
 		if result_data == null or attack_instance_scene == null:
 			continue
 		
-		# Calculer un offset pour séparer les résultats multiples
+		# Calculer un offset et direction pour séparer les résultats multiples
 		var offset = Vector2.ZERO
+		var spawn_direction = Vector2.ZERO
+		
 		if rule.result_attack_data.size() > 1:
-			# Séparer horizontalement
-			var spacing = 40.0
-			var total_width = (rule.result_attack_data.size() - 1) * spacing
-			offset = Vector2((i * spacing) - (total_width / 2.0), 0)
+			# Si c'est la réaction GAS_WATER_SPLIT, créer 2 projectiles à 45° de la direction d'arrivée
+			if rule.reaction_name == "GAS_WATER_SPLIT" and incoming_direction.length() > 0:
+				var base_angle = incoming_direction.angle()
+				var angle_offset = deg_to_rad(45.0) if i == 0 else deg_to_rad(-45.0)
+				var final_angle = base_angle + angle_offset
+				spawn_direction = Vector2(cos(final_angle), sin(final_angle))
+				# Décaler perpendiculairement à la direction d'arrivée (+50 / -50 pixels)
+				var perpendicular = Vector2(-incoming_direction.normalized().y, incoming_direction.normalized().x)
+				offset = perpendicular * (50.0 if i == 0 else -50.0)
+			else:
+				# Séparer horizontalement pour les autres réactions
+				var spacing = 40.0
+				var total_width = (rule.result_attack_data.size() - 1) * spacing
+				offset = Vector2((i * spacing) - (total_width / 2.0), 0)
 		
 		# Créer l'instance
 		var result_attack = attack_instance_scene.instantiate()
 		get_tree().root.add_child(result_attack)
-		result_attack.initialize(result_data, position + offset, Vector2.ZERO)
+		result_attack.initialize(result_data, position + offset, spawn_direction)
 
 ## Charge une AttackData avec cache
 func _load_attack_data(path: String) -> AttackData:
@@ -280,6 +351,7 @@ func get_element_name(element_type: AttackData.ElementType) -> String:
 		AttackData.ElementType.WATER: return "WATER"
 		AttackData.ElementType.ELECTRIC: return "ELECTRIC"
 		AttackData.ElementType.WIND: return "WIND"
+		AttackData.ElementType.FROZEN_GAS: return "FROZEN_GAS"
 		_: return "UNKNOWN"
 
 
